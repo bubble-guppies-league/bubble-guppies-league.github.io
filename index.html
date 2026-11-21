@@ -182,10 +182,23 @@ footer{padding:24px 0 40px;color:var(--mute);font-size:13px;text-align:center}
 .tro:hover .tip,.tro:focus .tip{opacity:1}
 .cabfoot{height:16px;margin:0 -2px;border-radius:0 0 6px 6px;background:linear-gradient(#b8913f,#7a5a1e)}
 @media(prefers-reduced-motion:reduce){.reef *,.reef *::after{animation:none!important;transition:none!important}.fish{display:none}}
+
+.dnagrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.dna .dnahead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.dnabody{display:flex;gap:12px;align-items:center}.radar{flex:none;color:var(--ink,#123);max-width:100%;height:auto}
+.dnafacts{display:grid;gap:7px;min-width:0}.dnafacts>div{display:flex;flex-direction:column}
+.dnastats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.dnastats div{display:flex;flex-direction:column;align-items:center;text-align:center}.dnastats b{font:700 16px Fredoka,sans-serif}.dnastats span{font-size:11px;color:var(--mute)}
+.dnacmp{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:12px}.dnacmp .radar{width:min(300px,100%)}
+.dbar{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:6px;margin:5px 0;font-size:13px}
+.dbar .dc{text-align:center;font-weight:600}.dbar .dl{color:var(--mute)}.dbar .dl.r{text-align:right}
+.dtrack{grid-column:1/-1;position:relative;height:6px;border-radius:3px;background:var(--line)}.dtrack i{position:absolute;top:0;height:100%;border-radius:3px}
+.heatt td.heat{font-weight:700;color:#1d2b2a;text-align:center;min-width:34px}
+@media(max-width:560px){.dnabody{flex-direction:column;align-items:stretch}.dnabody .radar{margin:0 auto}.dnagrid{grid-template-columns:1fr}}
 </style></head><body>
 <header class="top"><div class="wrap">
 <div class="brand"><img src="logo.webp" alt="" width="30" height="35"><span>Bubble Guppies</span></div>
-<nav id="nav"><a href="#home">Home</a><a href="#standings">Standings</a><a href="#matchups">Matchups</a><a href="#teams">Teams</a><a href="#players">Players</a><a href="#trades">Trades</a><a href="#moves">Moves</a><a href="#records">Records</a><a href="#champions">Champions</a></nav>
+<nav id="nav"><a href="#home">Home</a><a href="#standings">Standings</a><a href="#matchups">Matchups</a><a href="#teams">Teams</a><a href="#dna">DNA</a><a href="#players">Players</a><a href="#trades">Trades</a><a href="#moves">Moves</a><a href="#records">Records</a><a href="#champions">Champions</a></nav>
 </div></header>
 <section class="hero" id="hero"><div class="wrap">
 <div class="herohead"><img class="herologo" src="logo.webp" alt="Bubble Guppies Fantasy League logo"><div><h1>Bubble Guppies</h1>
@@ -245,7 +258,7 @@ function hero(){
 const cat=(m,s)=>Object.fromEntries(CATS.map(c=>[c,m.cats?.[c]?.[s]]));
 
 function standTable(full){
-  const po=D.settings?.playoff_teams||5;
+  const po=D.settings?.playoff_teams||6;
   const rows=D.standings.map((s,i)=>{const p=PWR[s.team],a=AP[s.team];const n=s.wins+s.losses+s.ties;
     return `<tr class="${i===po-1?'cut':''}"><td>${s.rank??i+1}</td><td class="tl">${tlink(s.team)}</td><td>${rec(s.team)}</td><td>${pct(n?(s.wins+s.ties/2)/n:NaN)}</td>${full?`<td>${p.cw}-${p.cl}-${p.ct}</td><td>${pct(p.cP)}</td><td>${a.w}-${a.l}${a.t?'-'+a.t:''}</td><td class="${p.luck>.05?'w':p.luck<-.05?'l':''}">${(p.luck>0?'+':'')+p.luck.toFixed(2)}</td><td>${p.streak||'–'}</td>`:''}<td>${p.rank}</td></tr>`}).join('');
   return `<div class="scroll"><table><thead><tr><th>#</th><th class="tl">Team</th><th>W-L-T</th><th>Pct</th>${full?'<th>Cats</th><th>Cat %</th><th>All-play</th><th>Luck</th><th>Streak</th>':''}<th>Power</th></tr></thead><tbody>${rows}</tbody></table></div><p class="small mute">Dashed line: playoff cut (top ${po}). Power = category placement points (10 for 1st, 1 for last) based on ${CB==='roster'?'current rosters':'finished weeks'}; switch it under Category strength.${full?' All-play: your weekly categories against every team, not just your opponent. Luck: real win % minus all-play win %.':''}</p>`;
@@ -549,6 +562,92 @@ document.addEventListener('click',e=>{const q=k=>e.target.closest(`[data-${k}]`)
 document.addEventListener('change',e=>{const id=e.target.id;if(id==='pteam')PS.team=e.target.value;else if(id==='ppos')PS.pos=e.target.value;else if(id==='pca')PS.ca=e.target.value;else if(id==='pcb')PS.cb=e.target.value;else return;PS.lim=60;psave();route()});
 document.addEventListener('input',e=>{if(e.target.id!=='pq')return;PS.q=e.target.value;PS.lim=60;psave();const t=document.getElementById('ptable');if(t)t.innerHTML=ptable()});
 
+// ===== Team DNA (read-only views; uses the same category lines as Category strength, changes nothing) =====
+let DNA={a:null,b:null};try{DNA=Object.assign(DNA,JSON.parse(localStorage.getItem('bg-dna')||'{}'))}catch(e){}
+const dsave=()=>{try{localStorage.setItem('bg-dna',JSON.stringify(DNA))}catch(e){}};
+const CATN={PTS:'Points',REB:'Rebounds',AST:'Assists',STL:'Steals',BLK:'Blocks','3PM':'Threes','FG%':'FG%','FT%':'FT%',TO:'Turnovers'};
+function dnaData(){
+  const K=catBasis(),n=T.length;
+  const out={};
+  // per-player value inside the league (z-score sum over the 9 cats, same stat source as the toggle)
+  const all=T.flatMap(t=>rosterOf(t).filter(p=>!hurt(p)).map(p=>({p,t,s:std(p)}))).filter(x=>x.s&&x.s.PTS!=null);
+  const M={},SD={};CATS.forEach(c=>{const v=all.map(x=>x.s[c]).filter(x=>x!=null).map(x=>PCT[c]&&x>1?x/100:+x);const m=v.reduce((a,b)=>a+b,0)/(v.length||1);M[c]=m;SD[c]=Math.sqrt(v.reduce((a,b)=>a+(b-m)**2,0)/(v.length||1))||1});
+  const zv=s=>CATS.reduce((a,c)=>{let x=s[c];if(x==null)return a;x=PCT[c]&&x>1?x/100:+x;return a+(LOW[c]?-1:1)*(x-M[c])/SD[c]},0);
+  const GL=D.games?.by_team||{};
+  for(const t of T){
+    const R=CATS.map(c=>K.r(t,c));const ps=rosterOf(t);const act=ps.filter(p=>!hurt(p));
+    const str=CATS.filter((c,i)=>R[i]<=3).sort((a,b)=>K.r(t,a)-K.r(t,b));
+    const weak=CATS.filter((c,i)=>R[i]>=n-2).sort((a,b)=>K.r(t,b)-K.r(t,a));
+    const r=c=>K.r(t,c),avg=R.reduce((a,b)=>a+b,0)/R.length;
+    let arch='Balanced build',why='No glaring hole: every category sits mid-table or better.';
+    const bigs=(r('REB')+r('BLK')+r('FG%'))/3,guards=(r('3PM')+r('AST')+r('FT%')+r('STL'))/4;
+    if(avg<=3.6&&Math.max(...R)<=n-3){arch='Complete contender';why='Top-tier almost everywhere. Hard to out-category.'}
+    else if(r('FT%')>=n-2&&bigs<=4){arch='Paint bullies';why='Lives on boards, blocks and efficiency; lets FT% go.'}
+    else if(guards<=4&&bigs>=n-3){arch='Small-ball guards';why='Threes, dimes, steals and free throws; gives up size.'}
+    else if(r('TO')>=n-1&&(r('PTS')<=3||r('AST')<=3)){arch='High-usage scorers';why='Big counting stats from ball-dominant players, at the cost of turnovers.'}
+    else if(r('TO')<=2&&r('PTS')>=n-3){arch='Careful low-usage';why='Rarely turns it over, but does not pile up volume.'}
+    else if(weak.length>=2){arch='Punt '+weak.slice(0,2).map(c=>CATN[c]).join(' + ');why='Built to win the other categories and concede these.'}
+    else if(str.length>=4){arch='Specialists';why='Dominant in a cluster of categories.'}
+    const pos={G:0,F:0,C:0};act.forEach(p=>{const q=p.pos||'';if(/C/.test(q))pos.C++;else if(/F/.test(q))pos.F++;else pos.G++});
+    const nba={};ps.forEach(p=>{if(p.team)nba[p.team]=(nba[p.team]||0)+1});
+    const stack=Object.entries(nba).sort((a,b)=>b[1]-a[1])[0];
+    const left=act.reduce((a,p)=>a+(GL[p.team]?.rest||0),0),next=act.reduce((a,p)=>a+(GL[p.team]?.next||0),0);
+    const vals=act.map(p=>({p,v:zv(std(p))})).sort((a,b)=>b.v-a.v);
+    const depth=vals.length?vals.slice(Math.max(0,vals.length-4)).reduce((a,x)=>a+x.v,0)/Math.min(4,vals.length):0;
+    const moves=(D.log||[]).filter(x=>x.team===t&&/ADD/.test(x.action)).length;
+    out[t]={R,str,weak,arch,why,pos,stack,left,next,vals,depth,inj:ps.length-act.length,moves,n:ps.length,pts:CATS.reduce((s,c,i)=>s+(n+1-R[i]),0)};
+  }
+  return out;
+}
+function radar(series,size){const n=CATS.length,cx=size/2,cy=size/2,rad=size/2-(size<200?30:36),N=T.length;
+  const pt=(i,f)=>{const a=-Math.PI/2+i*2*Math.PI/n;return [cx+Math.cos(a)*rad*f,cy+Math.sin(a)*rad*f]};
+  const ring=f=>CATS.map((c,i)=>pt(i,f).join(',')).join(' ');
+  let g=[.25,.5,.75,1].map(f=>`<polygon points="${ring(f)}" fill="none" stroke="currentColor" stroke-opacity=".14"/>`).join('');
+  g+=CATS.map((c,i)=>{const [x,y]=pt(i,1);const [lx,ly]=pt(i,1+(size<200?17:20)/rad);return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="currentColor" stroke-opacity=".12"/><text x="${lx}" y="${ly+3}" text-anchor="middle" font-size="${size<200?9:11}" fill="currentColor" opacity=".75">${esc(c)}</text>`}).join('');
+  g+=series.map(s=>{const p=s.R.map((r,i)=>pt(i,.12+.88*(N-r)/(N-1)).join(',')).join(' ');return `<polygon points="${p}" fill="${s.col}" fill-opacity=".28" stroke="${s.col}" stroke-width="2" stroke-linejoin="round"/>`}).join('');
+  return `<svg class="radar" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="Category profile">${g}</svg>`}
+const DC1='#14b8a6',DC2='#f59e0b';
+function dnaHeat(X){const n=T.length;const col=r=>{const f=(n-r)/(n-1);return `hsl(${Math.round(8+f*150)} 70% ${Math.round(88-f*30)}%)`};
+  const rows=[...T].sort((a,b)=>X[b].pts-X[a].pts).map(t=>`<tr><td class="tl">${tlink(t)}</td>${X[t].R.map((r,i)=>`<td class="heat" style="background:${col(r)}" title="${esc(CATN[CATS[i]])}: ${ord(r)}">${r}</td>`).join('')}<td><b>${X[t].pts}</b></td></tr>`).join('');
+  return `<div class="scroll"><table class="heatt"><thead><tr><th class="tl">Team</th>${CATS.map(c=>`<th>${esc(c)}</th>`).join('')}<th>Pts</th></tr></thead><tbody>${rows}</tbody></table></div><p class="small mute">Rank in each category (1 = best). Green is a strength, red a weakness. Pts = 10 for 1st down to 1 for last, summed.</p>`}
+function dnaCard(t,x){
+  const mvp=x.vals[0],top3=x.vals.slice(0,3).map(v=>esc(v.p.name)).join(', ');
+  const titles=(H||[]).filter(h=>{const m=(D.managers||{})[t];return m&&m.mkey&&h.mkey===m.mkey}).length;
+  const mgr=(D.managers||{})[t]?.first;
+  return `<div class="card dna"><div class="dnahead">${tlink(t)}<span class="tag">${esc(x.arch)}</span></div>
+  <div class="dnabody">${radar([{R:x.R,col:DC1}],170)}<div class="dnafacts">
+   <div class="small mute">${esc(x.why)}</div>
+   <div><span class="mute small">Strengths</span><b>${x.str.length?x.str.map(c=>esc(CATN[c])).join(', '):'–'}</b></div>
+   <div><span class="mute small">Weak spots</span><b>${x.weak.length?x.weak.map(c=>esc(CATN[c])).join(', '):'none'}</b></div>
+   <div><span class="mute small">Core</span><b>${top3||'–'}</b></div>
+  </div></div>
+  <div class="dnastats"><div><b>${x.pos.G}/${x.pos.F}/${x.pos.C}</b><span>G/F/C</span></div><div><b>${x.left}</b><span>games left this week</span></div><div><b>${x.next}</b><span>games next week</span></div><div><b>${x.inj}</b><span>IR / out</span></div><div><b>${x.moves}</b><span>pickups logged</span></div><div><b>${x.stack?esc(x.stack[0])+' ×'+x.stack[1]:'–'}</b><span>biggest NBA stack</span></div></div>
+  ${mgr?`<div class="small mute" style="margin-top:8px">Manager: <b>${esc(mgr)}</b>${titles?` · 🏆×${titles}`:''}</div>`:''}</div>`}
+function dnaCompare(X){
+  const a=X[DNA.a]?DNA.a:PW[0].t,b=X[DNA.b]&&DNA.b!==a?DNA.b:(PW.find(p=>p.t!==a)||{}).t;DNA.a=a;DNA.b=b;
+  const opt=(s,ex)=>T.filter(t=>t!==ex).map(t=>`<option value="${esc(t)}" ${t===s?'selected':''}>${nm(t)}</option>`).join('');
+  const A=X[a],B=X[b];const win=CATS.filter((c,i)=>A.R[i]<B.R[i]),lose=CATS.filter((c,i)=>A.R[i]>B.R[i]);
+  const rows=CATS.map((c,i)=>{const d=B.R[i]-A.R[i];return `<div class="dbar"><span class="dl">${ord(A.R[i])}</span><span class="dc">${esc(CATN[c])}</span><span class="dl r">${ord(B.R[i])}</span><div class="dtrack"><i style="left:50%;width:${Math.abs(d)/(T.length-1)*50}%;${d<0?'transform:translateX(-100%);background:'+DC2:'background:'+DC1}"></i></div></div>`}).join('');
+  return `<div class="card"><h2>Compare DNA</h2><div class="grid2"><label class="lab"><span style="color:${DC1}">●</span> Team A<select id="dnaa">${opt(a,b)}</select></label><label class="lab"><span style="color:${DC2}">●</span> Team B<select id="dnab">${opt(b,a)}</select></label></div>
+  <div class="dnacmp">${radar([{R:B.R,col:DC2},{R:A.R,col:DC1}],300)}<div style="flex:1;min-width:260px">${rows}
+  <p class="small" style="margin-top:10px"><b style="color:${DC1}">${nm(a)}</b> ranks higher in ${win.length} (${win.map(c=>esc(c)).join(', ')||'none'}); <b style="color:${DC2}">${nm(b)}</b> in ${lose.length} (${lose.map(c=>esc(c)).join(', ')||'none'}).</p>
+  <p class="small mute">${esc(A.arch)} vs ${esc(B.arch)}. For the projected head-to-head score, use Players → Team vs team.</p></div></div></div>`}
+function dnaLeaders(X){const n=T.length;
+  const best=c=>T.reduce((m,t)=>X[t].R[CATS.indexOf(c)]<X[m].R[CATS.indexOf(c)]?t:m,T[0]);
+  const deep=[...T].sort((a,b)=>X[b].depth-X[a].depth)[0],thin=[...T].sort((a,b)=>X[a].depth-X[b].depth)[0];
+  const busy=[...T].sort((a,b)=>X[b].left-X[a].left)[0],nxt=[...T].sort((a,b)=>X[b].next-X[a].next)[0];
+  const act=[...T].sort((a,b)=>X[b].moves-X[a].moves)[0];
+  const allP=T.flatMap(t=>X[t].vals.map(v=>({...v,t}))).sort((a,b)=>b.v-a.v);
+  const card=(lab,t,sub)=>`<div class="card rec"><span class="mute small">${lab}</span><div style="margin-top:6px">${tlink(t)}</div><div class="small mute" style="margin-top:4px">${sub}</div></div>`;
+  return `<div class="grid">${card('Deepest bench',deep,'Best average value of its 4 weakest active players')}${card('Most top-heavy',thin,'Weakest bottom of the roster')}${card('Most games left this week',busy,X[busy].left+' player-games still to play')}${card('Most games next week',nxt,X[nxt].next+' player-games scheduled')}${card('Busiest on the wire',act,X[act].moves+' pickups in the log')}${card('Best scorer',best('PTS'),'1st in projected points')}</div>
+  <div class="card" style="margin-top:18px"><h2>League's most valuable players</h2><p class="small mute" style="margin-top:-6px">Value = how far above the league's rostered average a player is, summed over the 9 categories (turnovers count against).</p><div class="scroll"><table><thead><tr><th>#</th><th class="tl">Player</th><th class="tl">Fantasy team</th><th>Value</th></tr></thead><tbody>${allP.slice(0,15).map((x,i)=>`<tr><td>${i+1}</td><td class="tl">${esc(x.p.name)} <span class="mute small">${esc(x.p.team||'')} · ${esc(x.p.pos||'')}</span></td><td class="tl">${tlink(x.t)}</td><td>${x.v.toFixed(1)}</td></tr>`).join('')}</tbody></table></div></div>`}
+V.dna=()=>{const X=dnaData();
+  return `<h2>Team DNA</h2><p class="mute" style="margin-top:-6px">What each roster is built to win, from the same projected-week numbers as Category strength. Switch the stat source here; it only changes what you see.</p>${cbBar()}
+  ${dnaCompare(X)}
+  <div class="card" style="margin-top:18px"><h2>League heat map</h2>${dnaHeat(X)}</div>
+  <h2 style="margin-top:26px">Every team's profile</h2><div class="dnagrid">${[...T].sort((a,b)=>X[b].pts-X[a].pts).map(t=>dnaCard(t,X[t])).join('')}</div>
+  <h2 style="margin-top:26px">Around the league</h2>${dnaLeaders(X)}`};
+document.addEventListener('change',e=>{const id=e.target.id;if(id==='dnaa')DNA.a=e.target.value;else if(id==='dnab')DNA.b=e.target.value;else return;dsave();route()});
 let CB='roster';try{CB=localStorage.getItem('bg-cb2')||'roster'}catch(e){}
 function stdLines(){const L={};for(const t of T)L[t]=lineS(rosterOf(t).filter(p=>!hurt(p)).map(std));return L}
 function catBasis(){if(CB==='roster'){const L=stdLines();return{r:(t,c)=>rk(L,t,c),v:(t,c)=>f1(c,L[t][c]),note:`Projected weekly output: the average per-game stats of every active player (IR/OUT left out) × 10 players × 3.5 games, using ${TS.mode==='season'?'season averages (projection if under 3 games)':TS.mode==='recent'?'recent form':'ESPN projections — same as the War Room'}.`}}return{r:(t,c)=>RK[t][c],v:(t,c)=>fmt(c,AV[t][c]),note:'Actual results: average weekly totals from the games played so far'}}
