@@ -124,6 +124,7 @@ tr.sel td{background:color-mix(in srgb,var(--aqua) 10%,transparent)}
 .cmph{display:flex;flex-direction:column;align-items:flex-end;gap:2px;white-space:normal}
 td.best{color:var(--win);font-weight:800;background:color-mix(in srgb,var(--aqua) 14%,transparent)}
 .vsrow{display:flex;align-items:center;justify-content:center;gap:22px}.vsc{text-align:center}
+.cbbar{display:flex;flex-wrap:wrap;gap:8px 12px;margin:10px 0 8px}.seg.sm button{min-height:36px;padding:0 12px;font-size:14px}
 footer{padding:24px 0 40px;color:var(--mute);font-size:13px;text-align:center}
 @media(max-width:600px){table{font-size:13px}td,th{padding:8px 4px}.brand span{display:none}.hero .sub{font-size:15px}}
 </style></head><body>
@@ -205,8 +206,8 @@ home(){
   const top=PW.slice(0,3).map(p=>`<div class="brow"><b class="big" style="font-size:22px">${p.rank}</b>${tlink(p.t)}<span class="small mute" style="text-align:right">${pct(p.apP)} AP</span></div>`).join('');
   return `<div class="cols"><div class="card"><h2>Standings</h2>${standTable(false)}</div><div class="stack2"><div class="card"><h2>Power top 3</h2>${top}<p class="small mute">Blend of all-play record, category win rate and actual record.</p></div><div class="card"><h2>Latest moves</h2>${feed(D.log||[],8)}</div></div></div>`},
 standings(){
-  const heat=T.map(t=>`<tr><td class="tl">${tlink(t)}</td>${CATS.map(c=>{const r=RK[t][c];const a=(T.length-r)/(T.length-1);return `<td style="background:color-mix(in srgb,var(--aqua) ${Math.round(a*55)}%,transparent)">${fmt(c,AV[t][c])}<span class="small mute"> ${r}</span></td>`}).join('')}</tr>`).join('');
-  return `<div class="card"><h2>League table</h2>${standTable(true)}</div><div class="card" style="margin-top:18px"><h2>Category strength</h2><p class="small mute" style="margin-top:-6px">Average weekly totals${DONE.length?` over ${DONE.length} completed weeks`:''}; small number is league rank, darker is better.</p><div class="scroll"><table class="heat"><thead><tr><th class="tl">Team</th>${CATS.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${heat}</tbody></table></div></div>`},
+  const K=catBasis();const heat=T.map(t=>`<tr><td class="tl">${tlink(t)}</td>${CATS.map(c=>{const r=K.r(t,c);const a=(T.length-r)/(T.length-1);return `<td style="background:color-mix(in srgb,var(--aqua) ${Math.round(a*55)}%,transparent)">${K.v(t,c)}<span class="small mute"> ${r}</span></td>`}).join('')}</tr>`).join('');
+  return `<div class="card"><h2>League table</h2>${standTable(true)}</div><div class="card" style="margin-top:18px"><h2>Category strength</h2>${cbBar()}<p class="small mute">${CB==='roster'?K.note:`Average weekly totals${DONE.length?` over ${DONE.length} completed weeks`:''}`}; small number is league rank, darker is better.</p><div class="scroll"><table class="heat"><thead><tr><th class="tl">Team</th>${CATS.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${heat}</tbody></table></div></div>`},
 matchups(){
   const w=wsel??W;const weeks=[...new Set(D.matchups.map(m=>m.week))].sort((a,b)=>a-b);
   const chips=weeks.map(x=>`<button class="chip ${x===w?'on':''}" data-wk="${x}">Week ${x}${x===W?' · live':''}</button>`).join('');
@@ -217,7 +218,7 @@ matchups(){
 teams(){
   const t=team&&ST[team]?team:D.standings[0].team;const p=PWR[t],s=ST[t];
   const chips=T.map(x=>`<button class="chip ${x===t?'on':''}" data-pick="${esc(x)}">${nm(x)}</button>`).join('');
-  const bars=CATS.map(c=>{const r=RK[t][c];return `<div class="brow"><b>${esc(c)}</b><div class="bar"><i style="width:${Math.round((T.length+1-r)/T.length*100)}%"></i></div><span class="small" style="text-align:right">${ord(r)} · ${fmt(c,AV[t][c])}</span></div>`}).join('');
+  const K=catBasis();const bars=CATS.map(c=>{const r=K.r(t,c);return `<div class="brow"><b>${esc(c)}</b><div class="bar"><i style="width:${Math.round((T.length+1-r)/T.length*100)}%"></i></div><span class="small" style="text-align:right">${ord(r)} · ${K.v(t,c)}</span></div>`}).join('');
   const res=G[t].map(g=>`<div class="res ${g.res} ${g.done?'':'live'}" title="vs ${esc(String(g.opp).trim())}"><b>${g.done?g.res:'•'}</b>${g.cw}-${g.cl}</div>`).join('');
   const reg=D.settings?.reg_season_weeks||17,sch=(D.schedule?.[t]||[]).map((o,i)=>({w:i+1,o})).filter(x=>x.w>W&&x.w<=reg);
   const sos=sch.length?sch.reduce((a,x)=>a+(PWR[x.o]?.rank||0),0)/sch.length:null;
@@ -228,7 +229,7 @@ teams(){
   return `<div class="chips">${chips}</div>
   <div class="card"><div class="mhead">${av(t,'lg')}<div style="flex:1"><h2 style="margin:0">${nm(t)}</h2><div class="mute">${ord(s.rank)} place · power #${p.rank}</div></div></div>
   <div class="stats"><div class="stat"><b>${rec(t)}</b><span>record</span></div><div class="stat"><b>${p.cw}-${p.cl}-${p.ct}</b><span>categories</span></div><div class="stat"><b>${AP[t].w}-${AP[t].l}</b><span>all-play</span></div><div class="stat"><b>${p.streak||'–'}</b><span>streak</span></div><div class="stat"><b>${moves.length}</b><span>moves logged</span></div></div></div>
-  <div class="cols" style="margin-top:18px"><div class="card"><h3>Category ranks</h3>${bars}</div><div class="stack2"><div class="card"><h3 style="margin-bottom:10px">Results</h3><div class="strip">${res}</div><p class="small mute">Category score each week; dashed is this week, live.</p></div><div class="card"><h3>Remaining schedule</h3><p class="small mute">Avg opponent power rank: ${sos?sos.toFixed(1):'–'} (1 is hardest)</p><div class="strip">${sch.map(x=>`<span class="chip" style="min-height:36px;cursor:default">W${x.w} ${nm(x.o)} <span class="mute small">#${PWR[x.o]?.rank??'–'}</span></span>`).join('')}</div></div></div></div>
+  <div class="cols" style="margin-top:18px"><div class="card"><h3>Category ranks</h3>${cbBar()}<p class="small mute" style="margin:0 0 6px">${K.note}</p>${bars}</div><div class="stack2"><div class="card"><h3 style="margin-bottom:10px">Results</h3><div class="strip">${res}</div><p class="small mute">Category score each week; dashed is this week, live.</p></div><div class="card"><h3>Remaining schedule</h3><p class="small mute">Avg opponent power rank: ${sos?sos.toFixed(1):'–'} (1 is hardest)</p><div class="strip">${sch.map(x=>`<span class="chip" style="min-height:36px;cursor:default">W${x.w} ${nm(x.o)} <span class="mute small">#${PWR[x.o]?.rank??'–'}</span></span>`).join('')}</div></div></div></div>
   <div class="card" style="margin-top:18px"><h3>Roster</h3><p class="small mute">Per-game averages, recent form where ESPN has it, otherwise projections.</p><div class="scroll"><table><thead><tr><th class="tl">Player</th><th>Slot</th>${CATS.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rrows}</tbody></table></div></div>
   <div class="card" style="margin-top:18px"><h3>Moves</h3>${feed(moves,15)}</div>`},
 moves(){
@@ -428,6 +429,10 @@ document.addEventListener('click',e=>{const q=k=>e.target.closest(`[data-${k}]`)
 document.addEventListener('change',e=>{const id=e.target.id;if(id==='pteam')PS.team=e.target.value;else if(id==='ppos')PS.pos=e.target.value;else if(id==='pca')PS.ca=e.target.value;else if(id==='pcb')PS.cb=e.target.value;else return;PS.lim=60;psave();route()});
 document.addEventListener('input',e=>{if(e.target.id!=='pq')return;PS.q=e.target.value;PS.lim=60;psave();const t=document.getElementById('ptable');if(t)t.innerHTML=ptable()});
 
+let CB='season';try{CB=localStorage.getItem('bg-cb')||'season'}catch(e){}
+function catBasis(){if(CB==='roster'){const L=lines();return{r:(t,c)=>rk(L,t,c),v:(t,c)=>f1(c,L[t][c]),note:`Projected per game from every player on the current roster (${TS.mode==='season'?'season averages':'recent form'}${TS.inj?'':', injured excluded'})`}}return{r:(t,c)=>RK[t][c],v:(t,c)=>fmt(c,AV[t][c]),note:'Actual results: average weekly totals from the games played so far'}}
+function cbBar(){return `<div class="cbbar"><div class="seg" role="group" aria-label="Category basis"><button class="${CB==='season'?'on':''}" data-cb="season">Season so far</button><button class="${CB==='roster'?'on':''}" data-cb="roster">Current roster</button></div>${CB==='roster'?`<div class="seg sm" role="group" aria-label="Player stats"><button class="${TS.mode==='recent'?'on':''}" data-tmode="recent">Recent form</button><button class="${TS.mode==='season'?'on':''}" data-tmode="season">Season avg</button></div>`:''}</div>`}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-cb]');if(!el)return;CB=el.dataset.cb;try{localStorage.setItem('bg-cb',CB)}catch(x){}route()});
 const ord=n=>n==null?'–':n+(['th','st','nd','rd'][(n%100-20)%10]||['th','st','nd','rd'][n%100]||'th');
 
 function route(){
