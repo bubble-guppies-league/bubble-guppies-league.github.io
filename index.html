@@ -125,6 +125,13 @@ tr.sel td{background:color-mix(in srgb,var(--aqua) 10%,transparent)}
 td.best{color:var(--win);font-weight:800;background:color-mix(in srgb,var(--aqua) 14%,transparent)}
 .vsrow{display:flex;align-items:center;justify-content:center;gap:22px}.vsc{text-align:center}
 .cbbar{display:flex;flex-wrap:wrap;gap:8px 12px;margin:10px 0 8px}.seg.sm button{min-height:36px;padding:0 12px;font-size:14px}
+.hstrip{display:flex;gap:14px;overflow-x:auto;padding:14px 2px 10px;scroll-snap-type:x mandatory}
+.pcard{flex:0 0 min(330px,86vw);scroll-snap-align:start}.pcard.mine{border:2px solid var(--aqua)}
+.pw2{display:flex;align-items:baseline;gap:8px;margin:2px 0 10px}.pw2 b{font:700 20px Fredoka,sans-serif}
+.ptbl td,.ptbl th{padding:6px 4px;font-size:14px}.pcard h4{margin:14px 0 6px;font-size:15px}
+.rl{list-style:none;margin:0;padding:0;columns:2;column-gap:12px;font-size:14px}.rl li{padding:3px 0;break-inside:avoid}.rl .in{color:var(--win);font-weight:700}.rl .out{color:var(--loss);text-decoration:line-through}
+.dealrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}.dealrow span{flex:1;min-width:200px}
+.planban{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;border-color:var(--aqua)}
 footer{padding:24px 0 40px;color:var(--mute);font-size:13px;text-align:center}
 @media(max-width:600px){table{font-size:13px}td,th{padding:8px 4px}.brand span{display:none}.hero .sub{font-size:15px}}
 </style></head><body>
@@ -252,7 +259,7 @@ champions(){
   return `<div class="card trophy"><svg viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#ffcf5a"/><stop offset="1" stop-color="#e59a1f"/></linearGradient></defs><ellipse cx="60" cy="108" rx="34" ry="6" fill="#0003"/><rect x="38" y="90" width="44" height="14" rx="3" fill="#0b5a6b"/><rect x="52" y="70" width="16" height="22" fill="url(#g)"/><path d="M30 18h60v18c0 22-14 36-30 36S30 58 30 36z" fill="url(#g)"/><path d="M30 26H16c0 16 8 24 18 24M90 26h14c0 16-8 24-18 24" fill="none" stroke="#e59a1f" stroke-width="6"/><path d="M42 24c0 18 4 30 12 36" stroke="#fff8" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="96" cy="64" r="5" fill="none" stroke="#35d8c6" stroke-width="2"/><circle cx="104" cy="48" r="3" fill="none" stroke="#35d8c6" stroke-width="2"/></svg><h2 style="margin:0">The trophy case is being stocked</h2><p class="mute" style="max-width:46ch;margin:0">Past seasons' champions, runners-up and regular-season winners are coming soon.</p></div>`}
 };
 // ===== Trades =====
-const TS={sub:'analyze',mode:'season',inj:false,a:null,b:null,ga:[],gb:[],me:null,w:{},plan:[],res:null};
+const TS={sub:'analyze',mode:'season',inj:false,deals:[],planAll:false,a:null,b:null,ga:[],gb:[],me:null,w:{},plan:[],res:null};
 try{Object.assign(TS,JSON.parse(localStorage.getItem('bg-trade2')||'{}'));TS.res=null}catch(e){}
 const tsave=()=>{try{const {res,...k}=TS;localStorage.setItem('bg-trade2',JSON.stringify(k))}catch(e){}};
 const EXTRA=['FGM','FGA','FTM','FTA'];
@@ -261,7 +268,7 @@ const seasonReady=()=>Object.values(D.rosters||{}).some(r=>r.some(p=>has(p.seaso
 const std=p=>(has(p.season)&&(+p.season.GP||0)>=3)?p.season:has(p.proj)?p.proj:has(p.avg)?p.avg:{};
 function pst(p){if(TS.mode==='season')return std(p);return has(p.avg)?p.avg:has(p.proj)?p.proj:{}}
 const hurt=p=>p.slot==='IR'||p.injury==='OUT';
-const rosterOf=t=>(D.rosters?.[t]||[]);
+let WORLD=null;const rosterOf=t=>((WORLD&&WORLD[t])||D.rosters?.[t]||[]);
 const counted=ps=>TS.inj?ps:ps.filter(p=>!hurt(p));
 const GPW=3.5;
 function lineS(S){const o={};S=S.filter(s=>s&&s.PTS!=null);for(const c of CATS){const xs=S.map(s=>s[c]).filter(x=>x!=null).map(Number);o[c]=xs.length?(PCT[c]?xs.reduce((a,x)=>a+(x>1?x/100:x),0)/xs.length:xs.reduce((a,b)=>a+b,0)/xs.length*10*GPW):null}return o}
@@ -295,7 +302,7 @@ const plist=(names)=>names.map(esc).join(', ')||'nothing';
 
 function tradeHead(){
   const miss=TS.mode==='season'&&!seasonReady();
-  return `<div class="chips" style="margin-bottom:10px"><button class="chip ${TS.sub==='analyze'?'on':''}" data-tsub="analyze">Analyzer</button><button class="chip ${TS.sub==='find'?'on':''}" data-tsub="find">Trade finder</button><button class="chip ${TS.sub==='plan'?'on':''}" data-tsub="plan">My plan${TS.plan.length?` (${TS.plan.length})`:''}</button></div>
+  return `<div class="chips" style="margin-bottom:10px"><button class="chip ${TS.sub==='analyze'?'on':''}" data-tsub="analyze">Analyzer</button><button class="chip ${TS.sub==='find'?'on':''}" data-tsub="find">Trade finder</button><button class="chip ${TS.sub==='plan'?'on':''}" data-tsub="plan">My plan${(TS.deals||[]).length?` (${TS.deals.length})`:''}</button></div>
   <div class="card tbar"><div class="seg" role="group" aria-label="Stats basis"><button class="${TS.mode==='recent'?'on':''}" data-tmode="recent">Recent form</button><button class="${TS.mode==='season'?'on':''}" data-tmode="season">Season so far</button></div>
   <label class="chk"><input type="checkbox" data-tinj ${TS.inj?'checked':''}> Count injured / IR players</label>
   <span class="small mute">Team strength = the <b>average</b> of every player's per-game stats × 10 players × 3.5 games (a projected week), same as the War Room.</span>
@@ -303,6 +310,8 @@ function tradeHead(){
 
 function analyzer(){
   const a=ST[TS.a]?TS.a:D.standings[0].team, b=ST[TS.b]&&TS.b!==a?TS.b:T.find(t=>t!==a);TS.a=a;TS.b=b;
+  TS.ga=TS.ga.filter(n=>rosterOf(a).some(p=>p.name===n));TS.gb=TS.gb.filter(n=>rosterOf(b).some(p=>p.name===n));
+  const banner=(TS.deals||[]).length?`<div class="card planban"><span>Rosters include <b>your plan (${TS.deals.length} deal${TS.deals.length>1?'s':''})</b>, so this trade builds on top of it.</span><button class="chip" data-tsub="plan">View plan</button></div>`:'';
   const V=pval(),PU=pickups();
   const opt=(sel,ex)=>T.filter(t=>t!==ex).map(t=>`<option value="${esc(t)}" ${t===sel?'selected':''}>${nm(t)}</option>`).join('');
   const side=(t,key)=>{const g=TS[key];return [...rosterOf(t)].sort((x,y)=>(V[y.name]||0)-(V[x.name]||0)).map(p=>{const s=pst(p),on=g.includes(p.name);
@@ -317,8 +326,8 @@ function analyzer(){
     const za=zDelta(B[a],A[a],SD),zb=zDelta(B[b],A[b],SD);const diff=za-zb;
     const verdict=Math.abs(diff)<0.35?'Pretty even trade.':`Leans toward <b>${nm(diff>0?a:b)}</b>.`;
     const ra='Rosters stay the same size: whoever gets an extra player drops their weakest, whoever is left short picks up the best free agent';
-    res=`<div class="card verdict"><h3>${verdict}</h3><p class="small mute" style="margin:6px 0 0">Score = change in team strength across all 9 categories, in league standard deviations. ${ra}.</p><div class="chips" style="margin:12px 0 0"><button class="chip" data-tsave>Save to my plan</button><button class="chip" data-tclear>Clear picks</button></div></div><div class="grid2">${card(a,TS.ga,TS.gb)}${card(b,TS.gb,TS.ga)}</div>`}
-  return `<div class="grid2"><div class="card"><label class="lab">Team A<select id="ta">${opt(a,b)}</select></label><div class="plist">${side(a,'ga')}</div></div><div class="card"><label class="lab">Team B<select id="tb">${opt(b,a)}</select></label><div class="plist">${side(b,'gb')}</div></div></div><p class="small mute">Tap players to put them in the deal. Number on the right is the player's overall value across the 9 categories.</p>${res||'<div class="card empty">Pick players from either side to see the trade breakdown.</div>'}`}
+    res=`<div class="card verdict"><h3>${verdict}</h3><p class="small mute" style="margin:6px 0 0">Score = change in team strength across all 9 categories, in league standard deviations. ${ra}.</p><div class="chips" style="margin:12px 0 0"><button class="chip on" data-tsave>Add to my plan</button><button class="chip" data-tclear>Clear picks</button></div></div><div class="grid2">${card(a,TS.ga,TS.gb)}${card(b,TS.gb,TS.ga)}</div>`}
+  return `${banner}<div class="grid2"><div class="card"><label class="lab">Team A<select id="ta">${opt(a,b)}</select></label><div class="plist">${side(a,'ga')}</div></div><div class="card"><label class="lab">Team B<select id="tb">${opt(b,a)}</select></label><div class="plist">${side(b,'gb')}</div></div></div><p class="small mute">Tap players to put them in the deal. Number on the right is the player's overall value across the 9 categories.</p>${res||'<div class="card empty">Pick players from either side to see the trade breakdown.</div>'}`}
 
 function runFinder(){
   const me=TS.me,w=Object.fromEntries(CATS.map(c=>[c,TS.w[c]==='t'?2:TS.w[c]==='p'?0:1]));
@@ -350,10 +359,36 @@ function finder(){
     res=`<div class="grid">${res}</div>`}
   return `<div class="card"><label class="lab">Your team<select id="tme">${opt}</select></label><p class="small mute" style="margin:12px 0 6px">Tap a category to cycle: normal → <b>target</b> (counts double) → <b>punt</b> (ignored).</p><div class="chips">${cc}</div><button class="chip on" data-tfind style="width:100%;justify-content:center">Find trades</button><p class="small mute" style="margin:10px 0 0">Scans every 1-for-1, 2-for-1 and 1-for-2 deal with every team (whoever gets the extra player drops their weakest; whoever is left short picks up the best free agent). It only shows deals that also keep the other team roughly even, and skips star-for-pickups deals nobody would accept.</p></div><div style="margin-top:18px">${res}</div>`}
 
+function planRosters(){const R={};for(const t of T)R[t]=[...(D.rosters?.[t]||[])];const miss=[];
+  for(const d of (TS.deals||[])){if(!R[d.a]||!R[d.b])continue;const outA=R[d.a].filter(p=>d.ga.includes(p.name)),outB=R[d.b].filter(p=>d.gb.includes(p.name));
+    d.ga.concat(d.gb).forEach(n=>{if(!outA.concat(outB).some(p=>p.name===n))miss.push(n)});
+    R[d.a]=R[d.a].filter(p=>!d.ga.includes(p.name)).concat(outB);R[d.b]=R[d.b].filter(p=>!d.gb.includes(p.name)).concat(outA)}
+  R.__miss=miss;return R}
+function linesOf(R){const L={};for(const t of T)L[t]=lineS(counted(R[t]||[]).map(pst));return L}
 function planView(){
-  if(!TS.plan.length)return `<div class="card empty">Your plan is empty. In the analyzer, build a trade and tap “Save to my plan”. Plans are saved only on this device.</div>`;
-  return `<div class="grid">${TS.plan.map((p,i)=>`<div class="card idea"><div class="small mute">${esc(new Date(p.at).toLocaleDateString(undefined,{month:'short',day:'numeric'}))} · ${p.mode==='season'?'season so far':'recent form'}</div><div class="deal"><div><span class="small mute">${nm(p.a)} gives</span><b>${plist(p.ga)}</b></div><div><span class="small mute">${nm(p.b)} gives</span><b>${plist(p.gb)}</b></div></div><div class="ideabot"><button class="chip" data-topen="${i}">Open</button><button class="chip" data-tdel="${i}">Remove</button></div></div>`).join('')}</div><p class="small mute">Saved only in this browser. Nobody else on the site can see or change it.</p>`}
-
+  const deals=TS.deals||[];
+  const me=ST[TS.me]?TS.me:(ST['Khadracadabra']?'Khadracadabra':D.standings[0].team);TS.me=me;
+  if(!deals.length)return `<div class="card empty">Your plan is empty. In the Analyzer, pick players from two teams and tap “Add to my plan”. Each deal is applied to both teams' rosters, and the next deal builds on top of it. Saved only on this device.</div>`;
+  const R0={};for(const t of T)R0[t]=D.rosters?.[t]||[];const R1=planRosters();
+  const L0=linesOf(R0),L1=linesOf(R1);
+  const pts=L=>{const o={};for(const t of T)o[t]=CATS.reduce((s,c)=>s+(T.length+1-rk(L,t,c)),0);return o};const P0=pts(L0),P1=pts(L1);
+  const prank=P=>{const o={};[...T].sort((a,b)=>P[b]-P[a]).forEach((t,i)=>o[t]=i+1);return o};const PR0=prank(P0),PR1=prank(P1);
+  const inv=[...new Set(deals.flatMap(d=>[d.a,d.b]))];
+  const show=TS.planAll?[me,...T.filter(t=>t!==me)]:[me,...inv.filter(t=>t!==me)];
+  const card=t=>{const r0=R0[t].map(p=>p.name),r1=R1[t].map(p=>p.name);const ins=R1[t].filter(p=>!r0.includes(p.name)),outs=R0[t].filter(p=>!r1.includes(p.name));
+    const n0=r0.length,n1=r1.length;
+    const rows=CATS.map(c=>{const a=rk(L0,t,c),b=rk(L1,t,c);return `<tr><td>${esc(c)}</td><td>${f1(c,L0[t][c])}</td><td><b>${f1(c,L1[t][c])}</b></td><td>${a===b?ord(a):`${ord(a)}→<b class="${b<a?'w':'l'}">${ord(b)}</b>`}</td></tr>`}).join('');
+    const kept=R1[t].filter(p=>r0.includes(p.name)).map(p=>`<li>${esc(p.name)}</li>`).join('');
+    return `<div class="card pcard ${t===me?'mine':''}"><div class="mhead">${av(t)}<span class="n">${nm(t)}${t===me?' <span class="tag add">you</span>':''}</span></div>
+    <div class="pw2"><span>Power</span><b>#${PR0[t]}</b>→<b class="${PR1[t]<PR0[t]?'w':PR1[t]>PR0[t]?'l':''}">#${PR1[t]}</b><span class="small mute">${P0[t]}→${P1[t]} pts</span></div>
+    <table class="ptbl"><thead><tr><th class="tl">Cat</th><th>Now</th><th>After</th><th>Rank</th></tr></thead><tbody>${rows}</tbody></table>
+    <h4>Roster after (${n1}${n1!==n0?`, was ${n0}`:''})</h4>${n1>n0?`<p class="small l" style="margin:0 0 6px">Needs to drop ${n1-n0} player${n1-n0>1?'s':''}</p>`:n1<n0?`<p class="small w" style="margin:0 0 6px">${n0-n1} open roster spot${n0-n1>1?'s':''}</p>`:''}
+    <ul class="rl">${ins.map(p=>`<li class="in">+ ${esc(p.name)}</li>`).join('')}${outs.map(p=>`<li class="out">− ${esc(p.name)}</li>`).join('')}${kept}</ul></div>`};
+  const list=deals.map((d,i)=>`<div class="dealrow"><b>${i+1}.</b><span>${nm(d.a)} ⇄ ${nm(d.b)}<br>${nm(d.a)} gets <b>${plist(d.gb)}</b> · ${nm(d.b)} gets <b>${plist(d.ga)}</b></span><button class="chip" data-tdel="${i}">Remove</button></div>`).join('');
+  const opt=T.map(t=>`<option value="${esc(t)}" ${t===me?'selected':''}>${nm(t)}</option>`).join('');
+  return `<div class="card"><h3>Your plan · ${deals.length} deal${deals.length>1?'s':''}, applied in order</h3>${list}${R1.__miss.length?`<p class="small l">Not on that roster anymore (skipped): ${plist(R1.__miss)}</p>`:''}<div class="chips" style="margin:12px 0 0"><button class="chip" data-tclearplan>Clear plan</button></div></div>
+  <div class="card" style="margin-top:14px;display:flex;flex-wrap:wrap;gap:12px;align-items:end"><label class="lab" style="min-width:220px">My team<select id="tme">${opt}</select></label><label class="chk"><input type="checkbox" data-tplanall ${TS.planAll?'checked':''}> Show all teams</label><span class="small mute">Projected week per team (same method as the War Room). Swipe sideways to see every team.</span></div>
+  <div class="hstrip">${show.map(card).join('')}</div>`}
 V.trades=()=>`<h2>Trades</h2>${tradeHead()}<div style="margin-top:18px">${TS.sub==='find'?finder():TS.sub==='plan'?planView():analyzer()}</div>`;
 
 document.addEventListener('click',e=>{const q=k=>e.target.closest(`[data-${k}]`);let el;
@@ -363,14 +398,15 @@ document.addEventListener('click',e=>{const q=k=>e.target.closest(`[data-${k}]`)
   else if(el=q('tw')){const c=el.dataset.tw,s=TS.w[c]||'n';TS.w[c]=s==='n'?'t':s==='t'?'p':'n';TS.res=null}
   else if(q('tfind')){el=q('tfind');el.textContent='Searching…';setTimeout(()=>{runFinder();tsave();route()},30);return}
   else if(el=q('tan')){const o=TS.res.top[+el.dataset.tan];Object.assign(TS,{sub:'analyze',a:TS.me,b:o.u,ga:o.g,gb:o.r})}
-  else if(q('tsave')){TS.plan.unshift({a:TS.a,b:TS.b,ga:TS.ga,gb:TS.gb,mode:TS.mode,at:Date.now()});TS.plan=TS.plan.slice(0,30);TS.sub='plan'}
+  else if(q('tsave')){if(!TS.ga.length&&!TS.gb.length)return;TS.deals=(TS.deals||[]).concat([{a:TS.a,b:TS.b,ga:[...TS.ga],gb:[...TS.gb],at:Date.now()}]).slice(-30);TS.ga=[];TS.gb=[];TS.me=ST[TS.me]?TS.me:TS.a;TS.sub='plan'}
+  else if(q('tclearplan')){TS.deals=[]}
   else if(q('tclear')){TS.ga=[];TS.gb=[]}
-  else if(el=q('topen')){const p=TS.plan[+el.dataset.topen];Object.assign(TS,{sub:'analyze',a:p.a,b:p.b,ga:p.ga,gb:p.gb,mode:p.mode})}
-  else if(el=q('tdel')){TS.plan.splice(+el.dataset.tdel,1)}
+  else if(el=q('tdel')){TS.deals.splice(+el.dataset.tdel,1);TS.ga=[];TS.gb=[]}
   else return;
   tsave();route()});
 document.addEventListener('change',e=>{const id=e.target.id;
   if(e.target.matches('[data-tinj]')){TS.inj=e.target.checked;TS.res=null}
+  else if(e.target.matches('[data-tplanall]')){TS.planAll=e.target.checked}
   else if(id==='ta'){TS.a=e.target.value;TS.ga=[]}
   else if(id==='tb'){TS.b=e.target.value;TS.gb=[]}
   else if(id==='tme'){TS.me=e.target.value;TS.res=null}
@@ -436,8 +472,9 @@ const ord=n=>n==null?'–':n+(['th','st','nd','rd'][(n%100-20)%10]||['th','st','
 
 function rerank(){const K=catBasis();const pts={};for(const t of T)pts[t]=CATS.reduce((s,c)=>s+(T.length+1-K.r(t,c)),0);PW.sort((a,b)=>pts[b.t]-pts[a.t]||K.r(a.t,CATS[0])-K.r(b.t,CATS[0]));PW.forEach((p,i)=>{p.rank=i+1;p.pts=pts[p.t];PWR[p.t]=p})}
 function route(){
-  try{rerank()}catch(e){console.error(e)}
-  const h=location.hash.slice(1);const v=V[h]?h:'home';
+  WORLD=null;try{rerank()}catch(e){console.error(e)}
+  const h=location.hash.slice(1);
+  if(h==='trades'&&(TS.deals||[]).length&&TS.sub!=='plan')WORLD=planRosters();const v=V[h]?h:'home';
   document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+v));
   $('#app').innerHTML=V[v]();
 }
