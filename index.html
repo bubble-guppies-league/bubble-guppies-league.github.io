@@ -259,14 +259,17 @@ champions(){
   return `<div class="card trophy"><svg viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#ffcf5a"/><stop offset="1" stop-color="#e59a1f"/></linearGradient></defs><ellipse cx="60" cy="108" rx="34" ry="6" fill="#0003"/><rect x="38" y="90" width="44" height="14" rx="3" fill="#0b5a6b"/><rect x="52" y="70" width="16" height="22" fill="url(#g)"/><path d="M30 18h60v18c0 22-14 36-30 36S30 58 30 36z" fill="url(#g)"/><path d="M30 26H16c0 16 8 24 18 24M90 26h14c0 16-8 24-18 24" fill="none" stroke="#e59a1f" stroke-width="6"/><path d="M42 24c0 18 4 30 12 36" stroke="#fff8" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="96" cy="64" r="5" fill="none" stroke="#35d8c6" stroke-width="2"/><circle cx="104" cy="48" r="3" fill="none" stroke="#35d8c6" stroke-width="2"/></svg><h2 style="margin:0">The trophy case is being stocked</h2><p class="mute" style="max-width:46ch;margin:0">Past seasons' champions, runners-up and regular-season winners are coming soon.</p></div>`}
 };
 // ===== Trades =====
-const TS={sub:'analyze',mode:'season',inj:false,deals:[],planAll:false,a:null,b:null,ga:[],gb:[],me:null,w:{},plan:[],res:null};
+const TS={sub:'analyze',mode:'proj',inj:false,deals:[],planAll:false,a:null,b:null,ga:[],gb:[],me:null,w:{},plan:[],res:null};
 try{Object.assign(TS,JSON.parse(localStorage.getItem('bg-trade2')||'{}'));TS.res=null}catch(e){}
 const tsave=()=>{try{const {res,...k}=TS;localStorage.setItem('bg-trade2',JSON.stringify(k))}catch(e){}};
 const EXTRA=['FGM','FGA','FTM','FTA'];
 const has=o=>o&&Object.keys(o).some(k=>CATS.includes(k));
 const seasonReady=()=>Object.values(D.rosters||{}).some(r=>r.some(p=>has(p.season)));
-const std=p=>(has(p.season)&&(+p.season.GP||0)>=3)?p.season:has(p.proj)?p.proj:has(p.avg)?p.avg:{};
-function pst(p){if(TS.mode==='season')return std(p);return has(p.avg)?p.avg:has(p.proj)?p.proj:{}}
+const prj=p=>has(p.proj)?p.proj:has(p.avg)?p.avg:{};
+const sea=p=>(has(p.season)&&(+p.season.GP||0)>=3)?p.season:prj(p);
+const std=p=>pst(p);
+function pst(p){if(TS.mode==='season')return sea(p);if(TS.mode==='recent')return has(p.avg)?p.avg:prj(p);return prj(p)}
+if(!TS.v3){TS.mode='proj';TS.v3=1}
 const hurt=p=>p.slot==='IR'||p.injury==='OUT';
 let WORLD=null;const rosterOf=t=>((WORLD&&WORLD[t])||D.rosters?.[t]||[]);
 const counted=ps=>TS.inj?ps:ps.filter(p=>!hurt(p));
@@ -303,7 +306,7 @@ const plist=(names)=>names.map(esc).join(', ')||'nothing';
 function tradeHead(){
   const miss=TS.mode==='season'&&!seasonReady();
   return `<div class="chips" style="margin-bottom:10px"><button class="chip ${TS.sub==='analyze'?'on':''}" data-tsub="analyze">Analyzer</button><button class="chip ${TS.sub==='find'?'on':''}" data-tsub="find">Trade finder</button><button class="chip ${TS.sub==='plan'?'on':''}" data-tsub="plan">My plan${(TS.deals||[]).length?` (${TS.deals.length})`:''}</button></div>
-  <div class="card tbar"><div class="seg" role="group" aria-label="Stats basis"><button class="${TS.mode==='recent'?'on':''}" data-tmode="recent">Recent form</button><button class="${TS.mode==='season'?'on':''}" data-tmode="season">Season so far</button></div>
+  <div class="card tbar"><div class="seg" role="group" aria-label="Player stats"><button class="${TS.mode==='proj'?'on':''}" data-tmode="proj">ESPN projections</button><button class="${TS.mode==='season'?'on':''}" data-tmode="season">Season so far</button><button class="${TS.mode==='recent'?'on':''}" data-tmode="recent">Recent form</button></div>
   <label class="chk"><input type="checkbox" data-tinj ${TS.inj?'checked':''}> Count injured / IR players</label>
   <span class="small mute">Team strength = the <b>average</b> of every player's per-game stats × 10 players × 3.5 games (a projected week), same as the War Room.</span>
   ${miss?'<p class="small" style="color:var(--coral);margin:0">Season-so-far averages arrive with the next data refresh; until then this shows recent form.</p>':''}</div>`}
@@ -418,7 +421,7 @@ try{Object.assign(PS,JSON.parse(localStorage.getItem('bg-players')||'{}'));PS.li
 const psave=()=>{try{localStorage.setItem('bg-players',JSON.stringify(PS))}catch(e){}};
 function allP(){const r=[];for(const t of T)for(const p of rosterOf(t))r.push({p,o:t});for(const p of (D.free_agents||[]))r.push({p,o:null});return r}
 const POS=['PG','SG','SF','PF','C'];
-function modeBar(team){return `<div class="card tbar"><div class="seg" role="group" aria-label="Stats basis"><button class="${TS.mode==='recent'?'on':''}" data-tmode="recent">Recent form</button><button class="${TS.mode==='season'?'on':''}" data-tmode="season">Season so far</button></div>${team?`<label class="chk"><input type="checkbox" data-tinj ${TS.inj?'checked':''}> Count injured / IR players</label>`:''}<span class="small mute">Recent form = last ~15 days. Season so far = every game this season.</span></div>`}
+function modeBar(team){return `<div class="card tbar"><div class="seg" role="group" aria-label="Player stats"><button class="${TS.mode==='proj'?'on':''}" data-tmode="proj">ESPN projections</button><button class="${TS.mode==='season'?'on':''}" data-tmode="season">Season so far</button><button class="${TS.mode==='recent'?'on':''}" data-tmode="recent">Recent form</button></div>${team?`<label class="chk"><input type="checkbox" data-tinj ${TS.inj?'checked':''}> Count injured / IR players</label>`:''}<span class="small mute">ESPN projections = what the War Room uses (default). Season so far = actual averages this season. Recent form = last ~15 days.</span></div>`}
 function prows(){const V=pval(),q=PS.q.trim().toLowerCase();
   let R=allP().filter(x=>(PS.team==='all'||(PS.team==='fa'?!x.o:x.o===PS.team))&&(PS.pos==='all'||(x.p.elig||[x.p.pos]).includes(PS.pos))&&(!q||x.p.name.toLowerCase().includes(q)||String(x.p.team).toLowerCase()===q));
   R.forEach(x=>{x.s=pst(x.p);x.v=V[x.p.name]??0});
@@ -465,8 +468,9 @@ document.addEventListener('input',e=>{if(e.target.id!=='pq')return;PS.q=e.target
 
 let CB='roster';try{CB=localStorage.getItem('bg-cb2')||'roster'}catch(e){}
 function stdLines(){const L={};for(const t of T)L[t]=lineS(rosterOf(t).filter(p=>!hurt(p)).map(std));return L}
-function catBasis(){if(CB==='roster'){const L=stdLines();return{r:(t,c)=>rk(L,t,c),v:(t,c)=>f1(c,L[t][c]),note:'Projected weekly output: the average per-game stats of every active player (IR/OUT left out) × 10 players × 3.5 games. Player stats = season averages (ESPN projection if under 3 games). Same method as the War Room.'}}return{r:(t,c)=>RK[t][c],v:(t,c)=>fmt(c,AV[t][c]),note:'Actual results: average weekly totals from the games played so far'}}
-function cbBar(){return `<div class="cbbar"><div class="seg" role="group" aria-label="Category basis"><button class="${CB==='season'?'on':''}" data-cb="season">Season so far</button><button class="${CB==='roster'?'on':''}" data-cb="roster">Current roster</button></div></div>`}
+function catBasis(){if(CB==='roster'){const L=stdLines();return{r:(t,c)=>rk(L,t,c),v:(t,c)=>f1(c,L[t][c]),note:`Projected weekly output: the average per-game stats of every active player (IR/OUT left out) × 10 players × 3.5 games, using ${TS.mode==='season'?'season averages (projection if under 3 games)':TS.mode==='recent'?'recent form':'ESPN projections — same as the War Room'}.`}}return{r:(t,c)=>RK[t][c],v:(t,c)=>fmt(c,AV[t][c]),note:'Actual results: average weekly totals from the games played so far'}}
+function cbBar(){return `<div class="cbbar"><div class="seg" role="group" aria-label="Category basis"><button class="${CB==='season'?'on':''}" data-cb="season">Season so far</button><button class="${CB==='roster'?'on':''}" data-cb="roster">Current roster</button></div>${CB==='roster'?seg3():''}</div>`}
+function seg3(){return `<div class="seg" role="group" aria-label="Player stats"><button class="${TS.mode==='proj'?'on':''}" data-tmode="proj">ESPN projections</button><button class="${TS.mode==='season'?'on':''}" data-tmode="season">Season so far</button><button class="${TS.mode==='recent'?'on':''}" data-tmode="recent">Recent form</button></div>`}
 document.addEventListener('click',e=>{const el=e.target.closest('[data-cb]');if(!el)return;CB=el.dataset.cb;try{localStorage.setItem('bg-cb2',CB)}catch(x){}route()});
 const ord=n=>n==null?'–':n+(['th','st','nd','rd'][(n%100-20)%10]||['th','st','nd','rd'][n%100]||'th');
 
