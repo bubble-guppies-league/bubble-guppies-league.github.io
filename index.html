@@ -238,10 +238,22 @@ nav{-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:li
 .gzt{cursor:pointer;text-decoration:underline;text-decoration-color:#c9b98f;text-underline-offset:2px}
 @media(max-width:900px){.gzcols{column-count:2}}
 @media(max-width:600px){.gzcols{column-count:1}.gzmini{grid-template-columns:1fr}.gzrule{justify-content:center}.gzrule span:last-child{display:none}}
+
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:16px}
+.member{display:flex;gap:16px;align-items:flex-start}
+.mphoto{flex:none;width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid var(--aqua);box-shadow:0 4px 12px #0002}
+.mphoto.ph{display:grid;place-items:center;background:linear-gradient(135deg,var(--sea1),#1aa6a0);color:#fff;font:700 32px Fredoka,sans-serif}
+.mbody2{min-width:0;flex:1}.mname{font:700 22px Fredoka,sans-serif}.mnick{font-weight:500;color:var(--mute);font-size:16px}
+.mteam{margin:4px 0 8px}.mchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.mchip{font-size:12px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:3px 9px;background:var(--soft)}.mchip.gold{background:#fdf1c7;border-color:#e9c96b;color:#6b4e00}
+.mbio{margin:0 0 10px;line-height:1.5}
+.mstats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;border-top:1px solid var(--line);padding-top:8px}
+.mstats div{display:flex;flex-direction:column;align-items:center;text-align:center}.mstats b{font:700 16px Fredoka,sans-serif}.mstats span{font-size:11px;color:var(--mute)}
+@media(max-width:600px){.member{flex-direction:column;align-items:center;text-align:center}.mphoto{width:110px;height:110px}.mchips{justify-content:center}.mteam .tn{justify-content:center}}
 </style></head><body>
 <header class="top"><div class="wrap">
 <div class="brand"><img src="logo.webp" alt="" width="30" height="35"><span>Bubble Guppies</span></div>
-<nav id="nav"><a href="#home">Home</a><a href="#gazette">Gazette</a><a href="#standings">Standings</a><a href="#odds">Odds</a><a href="#matchups">Matchups</a><a href="#teams">Teams</a><a href="#dna">DNA</a><a href="#players">Players</a><a href="#trades">Trades</a><a href="#moves">Moves</a><a href="#records">Records</a><a href="#champions">Champions</a></nav>
+<nav id="nav"><a href="#home">Home</a><a href="#gazette">Gazette</a><a href="#standings">Standings</a><a href="#odds">Odds</a><a href="#matchups">Matchups</a><a href="#teams">Teams</a><a href="#dna">DNA</a><a href="#players">Players</a><a href="#trades">Trades</a><a href="#moves">Moves</a><a href="#records">Records</a><a href="#members">Members</a><a href="#champions">Champions</a></nav>
 </div></header>
 <section class="hero" id="hero"><div class="wrap">
 <div class="herohead"><img class="herologo" src="logo.webp" alt="Bubble Guppies Fantasy League logo"><div><h1>Bubble Guppies</h1>
@@ -714,7 +726,7 @@ function runOdds(done){
   step()}
 function oddsKey(){return [D.updated,CB,TS.mode].join('|')}
 function oddsEnsure(){const key=oddsKey();if(ODDS.key===key&&ODDS.res)return ODDS.res;if(ODDS.busy===key)return null;ODDS.busy=key;
-  runOdds(r=>{ODDS.busy=false;ODDS.key=key;ODDS.res=r;const h=location.hash.slice(1);if(h==='odds'||h==='home'||h===''||h==='standings'||h==='gazette')route()});return null}
+  runOdds(r=>{ODDS.busy=false;ODDS.key=key;ODDS.res=r;const h=location.hash.slice(1);if(h==='odds'||h==='home'||h===''||h==='standings'||h==='gazette'||h==='members')route()});return null}
 const pc=(x,N)=>{const v=x/N*100;return v>=99.95?'>99.9%':v>0&&v<0.1?'<0.1%':v.toFixed(v<10&&v>0?1:0)+'%'};
 function obar(x,N,col){const v=Math.round(x/N*100);return `<div class="obar"><i style="width:${v}%;background:${col||'var(--teal,#14b8a6)'}"></i><span>${pc(x,N)}</span></div>`}
 V.odds=()=>{const S=oddsEnsure();
@@ -828,6 +840,26 @@ V.gazette=()=>{const G=gazette();const b=(k,inner)=>`<section class="gzsec"><div
    ${b('Classifieds',G.CL.map(x=>`<p class="gzad">${x}</p>`).join(''))}
    ${G.hist?b('From the archives',`<p>${G.hist}</p>`):''}
   </div><p class="gzs" style="text-align:center;margin-top:14px">A new edition prints every day. The Gazette is satire, written automatically from league data. No fish were harmed.</p></div>`};
+// ===== Members: one card per manager (bio + photo come from members.json; the rest is live league data) =====
+let MEM=null;fetch('members.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{MEM=j||{members:[]};if(location.hash==='#members')route()}).catch(()=>{MEM={members:[]}});
+V.members=()=>{
+  const mg=D.managers||{};const byKey={};(MEM?.members||[]).forEach(m=>{if(m.mkey)byKey[m.mkey]=m});
+  let X={};try{X=dnaData()}catch(e){}
+  const O=(typeof ODDS!=='undefined'&&ODDS.res)?ODDS.res:null;try{oddsEnsure()}catch(e){}
+  const sea=y=>`${y-1}–${String(y).slice(2)}`;
+  const rows=[...T].sort((a,b)=>(mg[a]?.first||a).localeCompare(mg[b]?.first||b)).map(t=>{
+    const m=mg[t]||{},k=m.mkey||'',info=byKey[k]||{};const name=info.name||m.first||'Manager';
+    const titles=(H||[]).filter(h=>k&&h.mkey===k),finals=(H||[]).filter(h=>k&&h.runner_up_mkey===k);
+    const st=ST[t],pw=PWR[t],dx=X[t];
+    const photo=info.photo?`<img class="mphoto" src="${esc(info.photo)}" alt="${esc(name)}" loading="lazy">`:`<div class="mphoto ph">${esc(name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase())}</div>`;
+    const chips=[titles.length?`<span class="mchip gold">🏆 ${titles.length}× champion</span>`:'',finals.length?`<span class="mchip">🥈 ${finals.length}× runner-up</span>`:'',dx?`<span class="mchip">${esc(dx.arch)}</span>`:''].filter(Boolean).join('');
+    return `<div class="card member">${photo}<div class="mbody2"><div class="mname">${esc(name)}${info.nickname?` <span class="mnick">“${esc(info.nickname)}”</span>`:''}</div>
+      <div class="mteam">${tlink(t)}</div>${chips?`<div class="mchips">${chips}</div>`:''}
+      <p class="mbio">${info.bio?esc(info.bio):'<span class="mute">Bio coming soon.</span>'}</p>
+      <div class="mstats"><div><b>${rec(t)}</b><span>record</span></div><div><b>${st?ord(D.standings.findIndex(s=>s.team===t)+1):'–'}</b><span>standings</span></div><div><b>${pw?'#'+pw.rank:'–'}</b><span>power</span></div><div><b>${O?Math.round(O.R[t].po/O.N*100)+'%':'…'}</b><span>playoff odds</span></div></div>
+      ${titles.length?`<div class="small mute" style="margin-top:6px">Titles: ${titles.map(h=>`${sea(h.year)} (${nm(h.champion)})`).join(', ')}</div>`:''}
+      ${info.fact?`<div class="small" style="margin-top:6px"><b>Fun fact:</b> ${esc(info.fact)}</div>`:''}</div></div>`}).join('');
+  return `<h2>Members</h2><p class="mute" style="margin-top:-6px">The ten managers of the Bubble Guppies. Records, power and odds update live; titles count for the person, whatever their team was called.</p><div class="mgrid">${rows}</div>`};
 let CB='roster';try{CB=localStorage.getItem('bg-cb2')||'roster'}catch(e){}
 function stdLines(){const L={};for(const t of T)L[t]=lineS(rosterOf(t).filter(p=>!hurt(p)).map(std));return L}
 function catBasis(){if(CB==='roster'){const L=stdLines();return{r:(t,c)=>rk(L,t,c),v:(t,c)=>f1(c,L[t][c]),note:`Projected weekly output: the average per-game stats of every active player (IR/OUT left out) × 10 players × 3.5 games, using ${TS.mode==='season'?'season averages (projection if under 3 games)':TS.mode==='recent'?'recent form':'ESPN projections — same as the War Room'}.`}}return{r:(t,c)=>RK[t][c],v:(t,c)=>fmt(c,AV[t][c]),note:'Actual results: average weekly totals from the games played so far'}}
