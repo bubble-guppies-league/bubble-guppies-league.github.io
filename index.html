@@ -138,6 +138,50 @@ td.best{color:var(--win);font-weight:800;background:color-mix(in srgb,var(--aqua
 .planban{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;border-color:var(--aqua)}
 footer{padding:24px 0 40px;color:var(--mute);font-size:13px;text-align:center}
 @media(max-width:600px){table{font-size:13px}td,th{padding:8px 4px}.brand span{display:none}.hero .sub{font-size:15px}}
+.reef{position:relative;overflow:hidden;isolation:isolate;border-radius:24px;padding:26px clamp(12px,3vw,30px) 90px;color:#e8fdff;background:linear-gradient(180deg,#0e86a3 0%,#0a5f80 30%,#07405f 62%,#052a42 100%);box-shadow:0 18px 40px #0005}
+.reef h2{margin:0;color:#fff;font:700 clamp(24px,4vw,34px) Fredoka,sans-serif;text-shadow:0 2px 10px #0006}
+.reef p{margin:6px 0 0;color:#c9f4fb;max-width:60ch}
+.reefhead{position:relative;z-index:3;display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:18px}
+.reefhead .clogo{width:clamp(90px,13vw,130px)}
+.ray{position:absolute;top:-30%;height:160%;width:18%;z-index:0;pointer-events:none;background:linear-gradient(180deg,#e6fdff55,#e6fdff00 75%);filter:blur(8px);transform-origin:top;animation:raysw 10s ease-in-out infinite alternate}
+.ray.r1{left:8%;transform:rotate(16deg)}.ray.r2{left:42%;width:12%;animation-duration:13s;opacity:.7;transform:rotate(9deg)}.ray.r3{left:72%;width:20%;animation-duration:15s;opacity:.55;transform:rotate(-6deg)}
+@keyframes raysw{from{translate:-4% 0;opacity:.35}to{translate:5% 0;opacity:.8}}
+.caus{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.18;background:radial-gradient(ellipse 60px 22px at 20% 30%,#fff 0,transparent 70%),radial-gradient(ellipse 80px 26px at 70% 18%,#fff 0,transparent 70%),radial-gradient(ellipse 50px 18px at 45% 55%,#fff 0,transparent 70%),radial-gradient(ellipse 70px 20px at 85% 62%,#fff 0,transparent 70%);background-size:340px 260px;animation:caus 14s linear infinite;mix-blend-mode:soft-light}
+@keyframes caus{to{background-position:340px 120px,-340px 260px,170px -260px,-170px 130px}}
+.reef .bub{z-index:1}
+.sand{position:absolute;left:0;right:0;bottom:0;height:70px;z-index:1;background:radial-gradient(120% 60px at 50% 0,transparent 60%,#0000 61%),linear-gradient(180deg,#d9c48a,#b79a5c);border-top-left-radius:50% 26px;border-top-right-radius:50% 26px;box-shadow:inset 0 8px 14px #0003}
+.weed{position:absolute;bottom:40px;z-index:2;width:60px;transform-origin:bottom center;animation:weed 5s ease-in-out infinite alternate}
+.weed.wl{left:1%;height:160px}.weed.wr{right:1%;height:130px;animation-duration:6.5s}
+@keyframes weed{from{transform:rotate(-5deg)}to{transform:rotate(6deg)}}
+.fish{position:absolute;top:22%;left:-80px;width:46px;z-index:1;opacity:.9;animation:swim 30s linear infinite}
+@keyframes swim{0%{transform:translate(0,0) scaleX(-1)}25%{transform:translate(30vw,20px) scaleX(-1)}50%{transform:translate(60vw,-10px) scaleX(-1)}100%{transform:translate(calc(100vw + 160px),30px) scaleX(-1)}}
+.mgrs{position:relative;z-index:3;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:22px}
+.mgr{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:14px;background:#ffffff14;border:1px solid #c8f7ff40;backdrop-filter:blur(4px)}
+.mgr.goat{background:linear-gradient(135deg,#ffe29a33,#ffffff10);border-color:#ffd97a88}
+.mrank{font:700 20px Fredoka,sans-serif;min-width:28px;text-align:center}
+.mgr b{color:#fff}.mx{font:700 18px Fredoka,sans-serif;color:#ffd76a}
+.mcups{display:flex;gap:3px;margin:3px 0}.mcups i{width:12px;height:15px;background:linear-gradient(#fff1a8,#c98a1c);clip-path:polygon(0 0,100% 0,85% 45%,60% 60%,60% 78%,80% 78%,80% 100%,20% 100%,20% 78%,40% 78%,40% 60%,15% 45%)}
+.msub{font-size:12px;color:#bfeaf2}
+.cab{position:relative;z-index:3;max-width:820px;margin:0 auto;padding:0 clamp(8px,2vw,18px) 10px;border-radius:20px 20px 8px 8px;background:linear-gradient(120deg,#ffffff26,#ffffff06 38%,#ffffff12 60%,#ffffff04);border:2px solid #dffcff70;box-shadow:inset 0 0 0 7px #ffffff0c,inset 0 0 60px #9ff5ec26,0 26px 50px #0009;backdrop-filter:blur(2px) saturate(1.2)}
+.cab::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent 30%,#ffffff2e 34%,transparent 40%,transparent 62%,#ffffff1a 65%,transparent 69%)}
+.cabtop{display:flex;flex-direction:column;align-items:center;margin:0 auto 4px;padding:8px 26px 10px;width:max-content;max-width:90%;border-radius:0 0 14px 14px;background:linear-gradient(#f6e3a6,#b8913f);color:#3a2a08;box-shadow:0 4px 10px #0006,inset 0 1px #fff9;text-align:center}
+.cabtop span{font:600 11px Fredoka,sans-serif;letter-spacing:.2em;text-transform:uppercase}.cabtop b{font:700 clamp(16px,2.6vw,20px) Fredoka,sans-serif}
+.shelf{position:relative;display:flex;justify-content:center;align-items:flex-start;gap:clamp(6px,3vw,34px);padding:18px 4px 14px}
+.shelf::after{content:"";position:absolute;left:-2px;right:-2px;bottom:0;height:10px;border-radius:3px;background:linear-gradient(180deg,#eaffff99,#9fe9f04d 40%,#5fc3d233);box-shadow:0 6px 12px #0006,inset 0 1px #fff}
+.tro{position:relative;margin:0;width:clamp(92px,24vw,170px);text-align:center;transition:transform .35s cubic-bezier(.2,.8,.2,1);outline:none}
+.cupw{position:relative;width:72%;margin:0 auto;filter:drop-shadow(0 8px 8px #0008)}
+.cupw svg{display:block;width:100%;height:auto}
+.cupw::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,#fff9 48%,transparent 60%);mix-blend-mode:overlay;opacity:0;transform:translateX(-120%);transition:transform .8s,opacity .3s}
+.tro:hover,.tro:focus{transform:translateY(-6px)}.tro:hover .cupw::after,.tro:focus .cupw::after{opacity:1;transform:translateX(120%)}
+.tro.latest .cupw{filter:drop-shadow(0 0 16px #ffd76acc) drop-shadow(0 8px 8px #0008);animation:glow 3s ease-in-out infinite alternate}
+@keyframes glow{to{filter:drop-shadow(0 0 26px #ffe9a0) drop-shadow(0 8px 8px #0008)}}
+.plate{margin:6px auto 0;max-width:100%;padding:5px 7px;border-radius:5px;background:linear-gradient(#f6e3a6,#b8913f);color:#3a2a08;box-shadow:inset 0 1px #fffa,0 3px 6px #0007;font:600 10px/1.2 Fredoka,sans-serif}
+.plate b{display:block;font-size:clamp(11px,1.6vw,13px);overflow-wrap:anywhere}.pyr{letter-spacing:.08em}
+.who{margin-top:5px;font-size:12px;color:#d9fbff}
+.tip{position:absolute;left:50%;bottom:100%;translate:-50% 0;z-index:5;width:max-content;max-width:220px;padding:7px 10px;border-radius:10px;background:#03202fe8;color:#e8fdff;font-size:12px;opacity:0;pointer-events:none;transition:opacity .2s}
+.tro:hover .tip,.tro:focus .tip{opacity:1}
+.cabfoot{height:16px;margin:0 -2px;border-radius:0 0 6px 6px;background:linear-gradient(#b8913f,#7a5a1e)}
+@media(prefers-reduced-motion:reduce){.reef *,.reef *::after{animation:none!important;transition:none!important}.fish{display:none}}
 </style></head><body>
 <header class="top"><div class="wrap">
 <div class="brand"><img src="logo.webp" alt="" width="30" height="35"><span>Bubble Guppies</span></div>
@@ -201,7 +245,7 @@ function hero(){
 const cat=(m,s)=>Object.fromEntries(CATS.map(c=>[c,m.cats?.[c]?.[s]]));
 
 function standTable(full){
-  const po=D.settings?.playoff_teams||6;
+  const po=D.settings?.playoff_teams||5;
   const rows=D.standings.map((s,i)=>{const p=PWR[s.team],a=AP[s.team];const n=s.wins+s.losses+s.ties;
     return `<tr class="${i===po-1?'cut':''}"><td>${s.rank??i+1}</td><td class="tl">${tlink(s.team)}</td><td>${rec(s.team)}</td><td>${pct(n?(s.wins+s.ties/2)/n:NaN)}</td>${full?`<td>${p.cw}-${p.cl}-${p.ct}</td><td>${pct(p.cP)}</td><td>${a.w}-${a.l}${a.t?'-'+a.t:''}</td><td class="${p.luck>.05?'w':p.luck<-.05?'l':''}">${(p.luck>0?'+':'')+p.luck.toFixed(2)}</td><td>${p.streak||'–'}</td>`:''}<td>${p.rank}</td></tr>`}).join('');
   return `<div class="scroll"><table><thead><tr><th>#</th><th class="tl">Team</th><th>W-L-T</th><th>Pct</th>${full?'<th>Cats</th><th>Cat %</th><th>All-play</th><th>Luck</th><th>Streak</th>':''}<th>Power</th></tr></thead><tbody>${rows}</tbody></table></div><p class="small mute">Dashed line: playoff cut (top ${po}). Power = category placement points (10 for 1st, 1 for last) based on ${CB==='roster'?'current rosters':'finished weeks'}; switch it under Category strength.${full?' All-play: your weekly categories against every team, not just your opponent. Luck: real win % minus all-play win %.':''}</p>`;
@@ -261,11 +305,35 @@ records(){
 champions(){
   const L='<img class="clogo" src="logo.webp" alt="Bubble Guppies Fantasy League logo">';
   const sea=y=>`${y-1}–${String(y).slice(2)}`;
-  if(H&&H.length){const tr=v=>typeof v==='string'?v.replace(/\s+/g,' ').trim():v;const s=[...H].map(x=>({...x,champion:tr(x.champion),runner_up:tr(x.runner_up),third:tr(x.third),regular_season:tr(x.regular_season),record:x.record==='0-0'?'':x.record})).sort((a,b)=>b.year-a.year);const cnt={};s.forEach(x=>{if(x.champion)cnt[x.champion]=(cnt[x.champion]||0)+1});
-    const multi=Object.entries(cnt).filter(e=>e[1]>1).sort((a,b)=>b[1]-a[1]);
-    return `<div class="card champhead">${L}<div><h2 style="margin:0">Hall of champions</h2><p class="mute" style="margin:6px 0 0">Every Bubble Guppies title since the league started in ${s.length?sea(s[s.length-1].year):'2020–21'}.${multi.length?` Multiple titles: ${multi.map(e=>`<b>${nm(e[0])}</b> ×${e[1]}`).join(', ')}.`:''}</p></div></div>
-    <div class="grid" style="margin-top:18px">${s.map((x,i)=>`<div class="card champ ${i===0?'latest':''}"><div class="cyr">${esc(sea(x.year))}${i===0?' <span class="tag add">latest</span>':''}</div><div class="ctro">🏆</div><h3>${nm(x.champion||'Unknown')}</h3>${x.manager?`<div class="small mute">${esc(x.manager)}</div>`:''}${x.record?`<div class="small mute">${esc(x.record)} regular season</div>`:''}<div class="cmeta">${x.runner_up?`<div><span class="mute small">Runner-up</span><b>${nm(x.runner_up)}</b></div>`:''}${x.third?`<div><span class="mute small">Third</span><b>${nm(x.third)}</b></div>`:''}${x.regular_season?`<div><span class="mute small">Regular-season #1</span><b>${nm(x.regular_season)}</b></div>`:''}</div></div>`).join('')}</div>`}
-  return `<div class="card trophy">${L}<h2 style="margin:0">The trophy case is being stocked</h2><p class="mute" style="max-width:46ch;margin:0">Past seasons' champions, runners-up and regular-season winners load with the next data update.</p></div>`}
+  if(!(H&&H.length))return `<div class="card trophy">${L}<h2 style="margin:0">The trophy case is being stocked</h2><p class="mute" style="max-width:46ch;margin:0">Past seasons' champions, runners-up and regular-season winners load with the next data update.</p></div>`;
+  const tr=v=>typeof v==='string'?v.replace(/\s+/g,' ').trim():v;
+  const s=[...H].map(x=>({...x,champion:tr(x.champion),runner_up:tr(x.runner_up),third:tr(x.third),regular_season:tr(x.regular_season),manager:tr(x.manager),record:x.record==='0-0'?'':x.record})).sort((a,b)=>a.year-b.year);
+  // titles belong to managers, not team names (people rename their teams)
+  const key=x=>x.mkey||('n:'+String(x.manager||x.champion||'').toLowerCase());
+  const G={};s.forEach(x=>{const k=key(x);(G[k]=G[k]||{name:x.manager||x.champion,wins:[],teams:[]}).wins.push(x);if(!G[k].teams.includes(x.champion))G[k].teams.push(x.champion)});
+  const now={};Object.entries(D.managers||{}).forEach(([t,m])=>{if(m&&m.mkey)now[m.mkey]=t});
+  const rank=Object.entries(G).sort((a,b)=>b[1].wins.length-a[1].wins.length||b[1].wins.at(-1).year-a[1].wins.at(-1).year);
+  const top=rank[0]?rank[0][1].wins.length:0;
+  const nth=n=>n+(n%10===1&&n%100!==11?'st':n%10===2&&n%100!==12?'nd':n%10===3&&n%100!==13?'rd':'th');
+  const cup=(i,big)=>`<svg viewBox="0 0 100 124" aria-hidden="true"><path d="M24 22c-14 0-17 22 4 28M76 22c14 0 17 22-4 28" fill="none" stroke="url(#gG)" stroke-width="6" stroke-linecap="round"/><path d="M22 14h56v14c0 26-13 40-28 42C35 68 22 54 22 28z" fill="url(#gG)"/><ellipse cx="50" cy="14" rx="28" ry="5" fill="#fff2b8"/><ellipse cx="50" cy="14.6" rx="24" ry="3.4" fill="#a8771f"/><path d="M31 22c0 18 6 30 13 36" stroke="#fff" stroke-opacity=".55" stroke-width="4" fill="none" stroke-linecap="round"/><text x="50" y="44" text-anchor="middle" font-size="15" fill="#8a5c12" font-weight="700">★</text><rect x="45" y="70" width="10" height="12" fill="url(#gG)"/><rect x="34" y="81" width="32" height="7" rx="2" fill="url(#gG)"/><rect x="26" y="88" width="48" height="${big?30:24}" rx="3" fill="url(#gB)"/><rect x="31" y="93" width="38" height="${big?20:14}" rx="1.5" fill="url(#gP)"/></svg>`;
+  const shelves=[];const per=3;const rev=[...s].reverse();for(let i=0;i<rev.length;i+=per)shelves.push(rev.slice(i,i+per));
+  const winNo={};const ord={};s.forEach(x=>{const k=key(x);winNo[k]=(winNo[k]||0)+1;ord[x.year]=winNo[k]});
+  const latest=s.at(-1).year;
+  const bubbles=Array.from({length:16},(_,i)=>{const z=5+((i*37)%14);return `<span class="bub" style="left:${(i*61)%100}%;width:${z}px;height:${z}px;animation-duration:${7+(i*13)%9}s;animation-delay:-${(i*17)%11}s"></span>`}).join('');
+  const weed=(cls,h)=>`<svg class="weed ${cls}" viewBox="0 0 60 ${h}" aria-hidden="true"><path d="M30 ${h}C18 ${h*.7} 42 ${h*.5} 28 ${h*.25} 22 ${h*.12} 30 4 30 4" stroke="#1f9e7a" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M14 ${h}C6 ${h*.75} 22 ${h*.55} 12 ${h*.35}" stroke="#2bb98d" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M46 ${h}C54 ${h*.8} 40 ${h*.6} 50 ${h*.42}" stroke="#178a6a" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`;
+  const fish=`<svg class="fish" viewBox="0 0 60 30" aria-hidden="true"><path d="M8 15C18 2 38 2 48 15 38 28 18 28 8 15z" fill="#ffb347"/><path d="M48 15l10-9v18z" fill="#ff8c42"/><path d="M22 6v18M30 5v20" stroke="#fff" stroke-width="3" opacity=".8"/><circle cx="15" cy="13" r="2" fill="#123"/></svg>`;
+  const leaders=rank.map(([k,g],i)=>{const n=g.wins.length;return `<div class="mgr ${n===top?'goat':''}"><div class="mrank">${n===top?'👑':i+1}</div><div class="mbody"><b>${esc(g.name)}</b> <span class="mx">×${n}</span><div class="mcups">${'<i></i>'.repeat(n)}</div><div class="msub">Won as ${g.teams.map(nm).join(' · ')}${g.wins[0].mkey&&now[g.wins[0].mkey]&&!g.teams.includes(tr(now[g.wins[0].mkey]))?` · now <b>${nm(now[g.wins[0].mkey])}</b>`:''}</div><div class="msub">${g.wins.map(w=>sea(w.year)).join(', ')}</div></div></div>`}).join('');
+  const cab=shelves.map(sh=>`<div class="shelf">${sh.map(x=>`<figure class="tro ${x.year===latest?'latest':''}" tabindex="0"><div class="cupw">${cup(0,x.year===latest)}</div><figcaption class="plate"><span class="pyr">${esc(sea(x.year))}</span><b>${nm(x.champion||'Unknown')}</b></figcaption><div class="who">${esc(x.manager||'')}${ord[x.year]>1?` · ${nth(ord[x.year])} title`:''}</div><div class="tip">${x.record?`${esc(x.record)} regular season<br>`:''}${x.runner_up?`Beat ${nm(x.runner_up)} in the final`:''}</div></figure>`).join('')}</div>`).join('');
+  const podium=[...s].reverse().map(x=>`<tr><td>${esc(sea(x.year))}</td><td class="tl"><b>${nm(x.champion)}</b>${x.manager?` <span class="mute small">${esc(x.manager)}</span>`:''}</td><td class="tl">${nm(x.runner_up)}${x.runner_up_manager?` <span class="mute small">${esc(x.runner_up_manager)}</span>`:''}</td><td class="tl">${nm(x.third)}</td><td class="tl">${nm(x.regular_season)}</td><td>${esc(x.record||'–')}</td></tr>`).join('');
+  return `<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="gG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1a8"/><stop offset=".35" stop-color="#f2c14e"/><stop offset=".7" stop-color="#c98a1c"/><stop offset="1" stop-color="#8a5a10"/></linearGradient><linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b4b5a"/><stop offset="1" stop-color="#0b2430"/></linearGradient><linearGradient id="gP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6e3a6"/><stop offset="1" stop-color="#b8913f"/></linearGradient></defs></svg>
+  <section class="reef" aria-label="Bubble Guppies trophy cabinet">
+    <div class="ray r1"></div><div class="ray r2"></div><div class="ray r3"></div><div class="caus"></div>${bubbles}${fish}${weed('wl',160)}${weed('wr',130)}
+    <div class="reefhead">${L}<div><h2>The Trophy Cabinet</h2><p>Every Bubble Guppies title since ${esc(sea(s[0].year))}, kept under glass at the bottom of the sea. Titles count for the <b>manager</b>, whatever the team was called that year.</p></div></div>
+    <div class="mgrs">${leaders}</div>
+    <div class="cab"><div class="cabtop"><span>Bubble Guppies</span><b>Hall of Champions</b></div>${cab}<div class="cabfoot"></div></div>
+    <div class="sand"></div>
+  </section>
+  <div class="card" style="margin-top:18px"><h2>Season by season</h2><div class="scroll"><table><thead><tr><th>Season</th><th class="tl">Champion</th><th class="tl">Runner-up</th><th class="tl">Third</th><th class="tl">Regular-season #1</th><th>Champ record</th></tr></thead><tbody>${podium}</tbody></table></div></div>`}
 };
 // ===== Trades =====
 const TS={sub:'analyze',mode:'proj',inj:false,deals:[],planAll:false,a:null,b:null,ga:[],gb:[],me:null,w:{},plan:[],res:null};
