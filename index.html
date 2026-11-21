@@ -193,7 +193,7 @@ function standTable(full){
   const po=D.settings?.playoff_teams||6;
   const rows=D.standings.map((s,i)=>{const p=PWR[s.team],a=AP[s.team];const n=s.wins+s.losses+s.ties;
     return `<tr class="${i===po-1?'cut':''}"><td>${s.rank??i+1}</td><td class="tl">${tlink(s.team)}</td><td>${rec(s.team)}</td><td>${pct(n?(s.wins+s.ties/2)/n:NaN)}</td>${full?`<td>${p.cw}-${p.cl}-${p.ct}</td><td>${pct(p.cP)}</td><td>${a.w}-${a.l}${a.t?'-'+a.t:''}</td><td class="${p.luck>.05?'w':p.luck<-.05?'l':''}">${(p.luck>0?'+':'')+p.luck.toFixed(2)}</td><td>${p.streak||'–'}</td>`:''}<td>${p.rank}</td></tr>`}).join('');
-  return `<div class="scroll"><table><thead><tr><th>#</th><th class="tl">Team</th><th>W-L-T</th><th>Pct</th>${full?'<th>Cats</th><th>Cat %</th><th>All-play</th><th>Luck</th><th>Streak</th>':''}<th>Power</th></tr></thead><tbody>${rows}</tbody></table></div><p class="small mute">Dashed line: playoff cut (top ${po}).${full?' All-play: your weekly categories against every team, not just your opponent. Luck: real win % minus all-play win %.':''}</p>`;
+  return `<div class="scroll"><table><thead><tr><th>#</th><th class="tl">Team</th><th>W-L-T</th><th>Pct</th>${full?'<th>Cats</th><th>Cat %</th><th>All-play</th><th>Luck</th><th>Streak</th>':''}<th>Power</th></tr></thead><tbody>${rows}</tbody></table></div><p class="small mute">Dashed line: playoff cut (top ${po}). Power = category placement points (10 for 1st, 1 for last) based on ${CB==='roster'?'current rosters':'finished weeks'}; switch it under Category strength.${full?' All-play: your weekly categories against every team, not just your opponent. Luck: real win % minus all-play win %.':''}</p>`;
 }
 
 function feed(list,n){
@@ -203,8 +203,8 @@ function feed(list,n){
 
 const V={
 home(){
-  const top=PW.slice(0,3).map(p=>`<div class="brow"><b class="big" style="font-size:22px">${p.rank}</b>${tlink(p.t)}<span class="small mute" style="text-align:right">${pct(p.apP)} AP</span></div>`).join('');
-  return `<div class="cols"><div class="card"><h2>Standings</h2>${standTable(false)}</div><div class="stack2"><div class="card"><h2>Power top 3</h2>${top}<p class="small mute">Blend of all-play record, category win rate and actual record.</p></div><div class="card"><h2>Latest moves</h2>${feed(D.log||[],8)}</div></div></div>`},
+  const top=PW.slice(0,3).map(p=>`<div class="brow"><b class="big" style="font-size:22px">${p.rank}</b>${tlink(p.t)}<span class="small mute" style="text-align:right">${p.pts} pts</span></div>`).join('');
+  return `<div class="cols"><div class="card"><h2>Standings</h2>${standTable(false)}</div><div class="stack2"><div class="card"><h2>Power top 3</h2>${cbBar()}${top}<p class="small mute">Points for where a team places in each category (10 for 1st, 1 for last), added up across all 9. Based on ${CB==='roster'?'current rosters':'finished weeks'}, same as the War Room.</p></div><div class="card"><h2>Latest moves</h2>${feed(D.log||[],8)}</div></div></div>`},
 standings(){
   const K=catBasis();const heat=T.map(t=>`<tr><td class="tl">${tlink(t)}</td>${CATS.map(c=>{const r=K.r(t,c);const a=(T.length-r)/(T.length-1);return `<td style="background:color-mix(in srgb,var(--aqua) ${Math.round(a*55)}%,transparent)">${K.v(t,c)}<span class="small mute"> ${r}</span></td>`}).join('')}</tr>`).join('');
   return `<div class="card"><h2>League table</h2>${standTable(true)}</div><div class="card" style="margin-top:18px"><h2>Category strength</h2>${cbBar()}<p class="small mute">${CB==='roster'?K.note:`Average weekly totals${DONE.length?` over ${DONE.length} completed weeks`:''}`}; small number is league rank, darker is better.</p><div class="scroll"><table class="heat"><thead><tr><th class="tl">Team</th>${CATS.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${heat}</tbody></table></div></div>`},
@@ -252,22 +252,20 @@ champions(){
   return `<div class="card trophy"><svg viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#ffcf5a"/><stop offset="1" stop-color="#e59a1f"/></linearGradient></defs><ellipse cx="60" cy="108" rx="34" ry="6" fill="#0003"/><rect x="38" y="90" width="44" height="14" rx="3" fill="#0b5a6b"/><rect x="52" y="70" width="16" height="22" fill="url(#g)"/><path d="M30 18h60v18c0 22-14 36-30 36S30 58 30 36z" fill="url(#g)"/><path d="M30 26H16c0 16 8 24 18 24M90 26h14c0 16-8 24-18 24" fill="none" stroke="#e59a1f" stroke-width="6"/><path d="M42 24c0 18 4 30 12 36" stroke="#fff8" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="96" cy="64" r="5" fill="none" stroke="#35d8c6" stroke-width="2"/><circle cx="104" cy="48" r="3" fill="none" stroke="#35d8c6" stroke-width="2"/></svg><h2 style="margin:0">The trophy case is being stocked</h2><p class="mute" style="max-width:46ch;margin:0">Past seasons' champions, runners-up and regular-season winners are coming soon.</p></div>`}
 };
 // ===== Trades =====
-const TS={sub:'analyze',mode:'recent',inj:true,a:null,b:null,ga:[],gb:[],me:null,w:{},plan:[],res:null};
-try{Object.assign(TS,JSON.parse(localStorage.getItem('bg-trade')||'{}'));TS.res=null}catch(e){}
-const tsave=()=>{try{const {res,...k}=TS;localStorage.setItem('bg-trade',JSON.stringify(k))}catch(e){}};
+const TS={sub:'analyze',mode:'season',inj:false,a:null,b:null,ga:[],gb:[],me:null,w:{},plan:[],res:null};
+try{Object.assign(TS,JSON.parse(localStorage.getItem('bg-trade2')||'{}'));TS.res=null}catch(e){}
+const tsave=()=>{try{const {res,...k}=TS;localStorage.setItem('bg-trade2',JSON.stringify(k))}catch(e){}};
 const EXTRA=['FGM','FGA','FTM','FTA'];
 const has=o=>o&&Object.keys(o).some(k=>CATS.includes(k));
 const seasonReady=()=>Object.values(D.rosters||{}).some(r=>r.some(p=>has(p.season)));
-function pst(p){if(TS.mode==='season'&&has(p.season))return p.season;return has(p.avg)?p.avg:has(p.proj)?p.proj:{}}
+const std=p=>(has(p.season)&&(+p.season.GP||0)>=3)?p.season:has(p.proj)?p.proj:has(p.avg)?p.avg:{};
+function pst(p){if(TS.mode==='season')return std(p);return has(p.avg)?p.avg:has(p.proj)?p.proj:{}}
 const hurt=p=>p.slot==='IR'||p.injury==='OUT';
 const rosterOf=t=>(D.rosters?.[t]||[]);
 const counted=ps=>TS.inj?ps:ps.filter(p=>!hurt(p));
-function line(ps){const o={};const S=ps.map(pst);
-  for(const c of CATS){if(PCT[c])continue;o[c]=S.reduce((a,s)=>a+(+s[c]||0),0)}
-  for(const [c,m,a] of [['FG%','FGM','FGA'],['FT%','FTM','FTA']]){const ok=S.filter(s=>s[m]!=null&&s[a]!=null);
-    if(ok.length===S.length&&S.length){const A=ok.reduce((x,s)=>x+ +s[a],0);o[c]=A?ok.reduce((x,s)=>x+ +s[m],0)/A:null}
-    else{let W=0,X=0;for(const s of S){if(s[c]==null)continue;const w=+s[a]||(+s.PTS||0)/(c==='FG%'?2:5)||.1;W+=w;X+=w*s[c]}o[c]=W?X/W:null}}
-  return o}
+const GPW=3.5;
+function lineS(S){const o={};S=S.filter(s=>s&&s.PTS!=null);for(const c of CATS){const xs=S.map(s=>s[c]).filter(x=>x!=null).map(Number);o[c]=xs.length?(PCT[c]?xs.reduce((a,x)=>a+(x>1?x/100:x),0)/xs.length:xs.reduce((a,b)=>a+b,0)/xs.length*10*GPW):null}return o}
+function line(ps){return lineS(ps.map(pst))}
 function settle(ps,n,V,keep){ps=[...ps];const dr=[],ad=[];while(ps.length<n){const f=FAP.find(p=>!ps.some(q=>q.name===p.name));if(!f)break;ps.push(f);ad.push(f.name)}while(ps.length>n){let i=-1,lo=1e9;ps.forEach((p,j)=>{if(keep.has(p.name))return;const v=V[p.name]??0;if(v<lo){lo=v;i=j}});if(i<0)break;dr.push(ps[i].name);ps.splice(i,1)}return{ps,dr,ad}}
 let DROPS={};
 function lines(sw,V){const L={};DROPS={};for(const t of T){let ps=rosterOf(t);const n0=ps.length;
@@ -300,7 +298,7 @@ function tradeHead(){
   return `<div class="chips" style="margin-bottom:10px"><button class="chip ${TS.sub==='analyze'?'on':''}" data-tsub="analyze">Analyzer</button><button class="chip ${TS.sub==='find'?'on':''}" data-tsub="find">Trade finder</button><button class="chip ${TS.sub==='plan'?'on':''}" data-tsub="plan">My plan${TS.plan.length?` (${TS.plan.length})`:''}</button></div>
   <div class="card tbar"><div class="seg" role="group" aria-label="Stats basis"><button class="${TS.mode==='recent'?'on':''}" data-tmode="recent">Recent form</button><button class="${TS.mode==='season'?'on':''}" data-tmode="season">Season so far</button></div>
   <label class="chk"><input type="checkbox" data-tinj ${TS.inj?'checked':''}> Count injured / IR players</label>
-  <span class="small mute">Team strength = per-game averages of <b>every</b> player on the roster added up (FG%/FT% from total makes ÷ attempts).</span>
+  <span class="small mute">Team strength = the <b>average</b> of every player's per-game stats × 10 players × 3.5 games (a projected week), same as the War Room.</span>
   ${miss?'<p class="small" style="color:var(--coral);margin:0">Season-so-far averages arrive with the next data refresh; until then this shows recent form.</p>':''}</div>`}
 
 function analyzer(){
@@ -415,8 +413,8 @@ function tcmp(){const a=ST[PS.ca]?PS.ca:D.standings[0].team,b=ST[PS.cb]&&PS.cb!=
   const h2h=G[a].filter(g=>g.opp===b).map(g=>`<span class="tchg">W${g.week}: ${g.cw}-${g.cl}${g.done?'':' (live)'}</span>`).join('');
   return `<div class="grid2"><div class="card"><label class="lab">Team A<select id="pca">${opt(a,b)}</select></label></div><div class="card"><label class="lab">Team B<select id="pcb">${opt(b,a)}</select></label></div></div>
   <div class="card" style="margin-top:18px"><div class="vsrow">${av(a,'lg')}<div class="vsc"><div class="big">${r.w} – ${r.l}</div><div class="small mute">projected categories${r.t?`, ${r.t} tied`:''}</div></div>${av(b,'lg')}</div>
-  <p class="small mute" style="text-align:center;margin:6px 0 14px">Based on every rostered player's per-game numbers. Actual weekly averages so far: ${act.w}-${act.l}${act.t?'-'+act.t:''}.${h2h?'<br>Head-to-head this season: ':''}</p>${h2h?`<div class="tchgs" style="justify-content:center;margin-bottom:12px">${h2h}</div>`:''}
-  <div class="scroll"><table><thead><tr><th class="tl">Cat</th><th>${nm(a)}<br><span class="mute small">roster/game</span></th><th>${nm(b)}<br><span class="mute small">roster/game</span></th><th>${nm(a)}<br><span class="mute small">avg week</span></th><th>${nm(b)}<br><span class="mute small">avg week</span></th><th>Rank A / B</th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
+  <p class="small mute" style="text-align:center;margin:6px 0 14px">Projected week from every player's averages (same method as the War Room). Actual weekly averages so far: ${act.w}-${act.l}${act.t?'-'+act.t:''}.${h2h?'<br>Head-to-head this season: ':''}</p>${h2h?`<div class="tchgs" style="justify-content:center;margin-bottom:12px">${h2h}</div>`:''}
+  <div class="scroll"><table><thead><tr><th class="tl">Cat</th><th>${nm(a)}<br><span class="mute small">roster/week</span></th><th>${nm(b)}<br><span class="mute small">roster/week</span></th><th>${nm(a)}<br><span class="mute small">avg week</span></th><th>${nm(b)}<br><span class="mute small">avg week</span></th><th>Rank A / B</th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
 V.players=()=>`<h2>Players &amp; compare</h2><div class="chips" style="margin-bottom:10px"><button class="chip ${PS.sub==='list'?'on':''}" data-psub="list">Players</button><button class="chip ${PS.sub==='cmp'?'on':''}" data-psub="cmp">Compare players${PS.sel.length?` (${PS.sel.length})`:''}</button><button class="chip ${PS.sub==='teams'?'on':''}" data-psub="teams">Team vs team</button></div>${modeBar(PS.sub==='teams')}<div style="margin-top:18px">${PS.sub==='cmp'?pcmp():PS.sub==='teams'?tcmp():plistView()}</div>`;
 document.addEventListener('click',e=>{const q=k=>e.target.closest(`[data-${k}]`);let el;
   if(el=q('psub'))PS.sub=el.dataset.psub;
@@ -429,13 +427,16 @@ document.addEventListener('click',e=>{const q=k=>e.target.closest(`[data-${k}]`)
 document.addEventListener('change',e=>{const id=e.target.id;if(id==='pteam')PS.team=e.target.value;else if(id==='ppos')PS.pos=e.target.value;else if(id==='pca')PS.ca=e.target.value;else if(id==='pcb')PS.cb=e.target.value;else return;PS.lim=60;psave();route()});
 document.addEventListener('input',e=>{if(e.target.id!=='pq')return;PS.q=e.target.value;PS.lim=60;psave();const t=document.getElementById('ptable');if(t)t.innerHTML=ptable()});
 
-let CB='season';try{CB=localStorage.getItem('bg-cb')||'season'}catch(e){}
-function catBasis(){if(CB==='roster'){const L=lines();return{r:(t,c)=>rk(L,t,c),v:(t,c)=>f1(c,L[t][c]),note:`Projected per game from every player on the current roster (${TS.mode==='season'?'season averages':'recent form'}${TS.inj?'':', injured excluded'})`}}return{r:(t,c)=>RK[t][c],v:(t,c)=>fmt(c,AV[t][c]),note:'Actual results: average weekly totals from the games played so far'}}
-function cbBar(){return `<div class="cbbar"><div class="seg" role="group" aria-label="Category basis"><button class="${CB==='season'?'on':''}" data-cb="season">Season so far</button><button class="${CB==='roster'?'on':''}" data-cb="roster">Current roster</button></div>${CB==='roster'?`<div class="seg sm" role="group" aria-label="Player stats"><button class="${TS.mode==='recent'?'on':''}" data-tmode="recent">Recent form</button><button class="${TS.mode==='season'?'on':''}" data-tmode="season">Season avg</button></div>`:''}</div>`}
-document.addEventListener('click',e=>{const el=e.target.closest('[data-cb]');if(!el)return;CB=el.dataset.cb;try{localStorage.setItem('bg-cb',CB)}catch(x){}route()});
+let CB='roster';try{CB=localStorage.getItem('bg-cb2')||'roster'}catch(e){}
+function stdLines(){const L={};for(const t of T)L[t]=lineS(rosterOf(t).filter(p=>!hurt(p)).map(std));return L}
+function catBasis(){if(CB==='roster'){const L=stdLines();return{r:(t,c)=>rk(L,t,c),v:(t,c)=>f1(c,L[t][c]),note:'Projected weekly output: the average per-game stats of every active player (IR/OUT left out) × 10 players × 3.5 games. Player stats = season averages (ESPN projection if under 3 games). Same method as the War Room.'}}return{r:(t,c)=>RK[t][c],v:(t,c)=>fmt(c,AV[t][c]),note:'Actual results: average weekly totals from the games played so far'}}
+function cbBar(){return `<div class="cbbar"><div class="seg" role="group" aria-label="Category basis"><button class="${CB==='season'?'on':''}" data-cb="season">Season so far</button><button class="${CB==='roster'?'on':''}" data-cb="roster">Current roster</button></div></div>`}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-cb]');if(!el)return;CB=el.dataset.cb;try{localStorage.setItem('bg-cb2',CB)}catch(x){}route()});
 const ord=n=>n==null?'–':n+(['th','st','nd','rd'][(n%100-20)%10]||['th','st','nd','rd'][n%100]||'th');
 
+function rerank(){const K=catBasis();const pts={};for(const t of T)pts[t]=CATS.reduce((s,c)=>s+(T.length+1-K.r(t,c)),0);PW.sort((a,b)=>pts[b.t]-pts[a.t]);PW.forEach((p,i)=>{p.rank=i+1;p.pts=pts[p.t];PWR[p.t]=p})}
 function route(){
+  try{rerank()}catch(e){console.error(e)}
   const h=location.hash.slice(1);const v=V[h]?h:'home';
   document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+v));
   $('#app').innerHTML=V[v]();
