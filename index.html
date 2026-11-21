@@ -434,7 +434,7 @@ function cbBar(){return `<div class="cbbar"><div class="seg" role="group" aria-l
 document.addEventListener('click',e=>{const el=e.target.closest('[data-cb]');if(!el)return;CB=el.dataset.cb;try{localStorage.setItem('bg-cb2',CB)}catch(x){}route()});
 const ord=n=>n==null?'–':n+(['th','st','nd','rd'][(n%100-20)%10]||['th','st','nd','rd'][n%100]||'th');
 
-function rerank(){const K=catBasis();const pts={};for(const t of T)pts[t]=CATS.reduce((s,c)=>s+(T.length+1-K.r(t,c)),0);PW.sort((a,b)=>pts[b.t]-pts[a.t]);PW.forEach((p,i)=>{p.rank=i+1;p.pts=pts[p.t];PWR[p.t]=p})}
+function rerank(){const K=catBasis();const pts={};for(const t of T)pts[t]=CATS.reduce((s,c)=>s+(T.length+1-K.r(t,c)),0);PW.sort((a,b)=>pts[b.t]-pts[a.t]||K.r(a.t,CATS[0])-K.r(b.t,CATS[0]));PW.forEach((p,i)=>{p.rank=i+1;p.pts=pts[p.t];PWR[p.t]=p})}
 function route(){
   try{rerank()}catch(e){console.error(e)}
   const h=location.hash.slice(1);const v=V[h]?h:'home';
