@@ -1,0 +1,85 @@
+{
+  "_note": "Edit bio, nickname, fact and photo (e.g. members/ahmad.jpg). mkey links a person to their ESPN account; leave it as is.",
+  "members": [
+    {
+      "name": "Ahmad",
+      "mkey": "6c0614c8cf",
+      "nickname": "",
+      "bio": "",
+      "fact": "",
+      "photo": ""
+    },
+    {
+      "name": "Aren",
+      "mkey": "f0cc1e83cf",
+      "nickname": "",
+      "bio": "",
+      "fact": "",
+      "photo": ""
+    },
+    {
+      "name": "Hadi",
+      "mkey": "f82a6399e7",
+      "nickname": "",
+      "bio": "",
+      "fact": "",
+      "photo": ""
+    },
+    {
+      "name": "Marc Joseph",
+      "mkey": "af3443f5d0",
+      "nickname": "",
+      "bio": "",
+      "fact": "",
+      "photo": ""
+    },
+    {
+      "name": "Mohamad",
+      "mkey": "5b83636c41",
+      "nickname": "",
+      "bio": "",
+      "fact": "",
+      "photo": ""
+    },
+    {
+      "name": "MohammedNour",
+      "mkey": "9ec67ba187",
+      "nickname": "",
+      "bio": "",
+      "fact": "",
+      "photo": ""
+    },
+    {
+      "name": "Nabil",
+      "mkey": "67d84480a6",
+      "nickname": "",
+      "bio": "",
+      "fact": "",
+      "photo": ""
+    },
+    {
+      "name": "Nadim",
+      "mkey": "e16dd6aac7",
+      "nickname": "",
+      "bio": "",
+      "fact": "",
+      "photo": ""
+    },
+    {
+      "name": "Saad",
+      "mkey": "5c0f5b0428",
+      "nickname": "",
+      "bio": "",
+      "fact": "",
+      "photo": ""
+    },
+    {
+      "name": "Yehya",
+      "mkey": "e835754602",
+      "nickname": "",
+      "bio": "",
+      "fact": "",
+      "photo": ""
+    }
+  ]
+}
