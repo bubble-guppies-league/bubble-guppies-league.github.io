@@ -250,6 +250,23 @@ nav{-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:li
 .mstats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;border-top:1px solid var(--line);padding-top:8px}
 .mstats div{display:flex;flex-direction:column;align-items:center;text-align:center}.mstats b{font:700 16px Fredoka,sans-serif}.mstats span{font-size:11px;color:var(--mute)}
 @media(max-width:600px){.member{flex-direction:column;align-items:center;text-align:center}.mphoto{width:110px;height:110px}.mchips{justify-content:center}.mteam .tn{justify-content:center}}
+
+.subnav{display:flex;gap:6px;margin:-4px 0 18px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);padding-bottom:0}.subnav::-webkit-scrollbar{display:none}
+.subnav a{flex:none;padding:10px 14px;font-weight:700;color:var(--mute);text-decoration:none;border-bottom:3px solid transparent;margin-bottom:-1px}
+.subnav a.on{color:var(--sea1);border-bottom-color:var(--aqua)}.subnav a:hover{color:var(--sea1)}
+.cflane{position:absolute;left:66%;right:12px;top:4px;height:200px;pointer-events:none;z-index:3}
+.cfish{position:absolute;left:-90px;width:70px;animation:cfswim 30s linear infinite}
+.cfish svg{width:100%;height:auto;overflow:visible;animation:cfbob 2.4s ease-in-out infinite;filter:drop-shadow(0 4px 6px #0006)}
+.cfish.f1{top:130px}.cfish.f2{top:60px;width:56px;animation-duration:40s;animation-delay:-20s}
+.cfish.talking{animation-play-state:paused}
+.cfish .say{position:absolute;bottom:calc(100% + 6px);left:50%;translate:-50% 0;width:max-content;max-width:260px;background:#fff;color:#123;font:600 13px/1.35 Fredoka,system-ui,sans-serif;padding:8px 11px;border-radius:14px;box-shadow:0 6px 16px #0005;opacity:0;scale:.6;transition:opacity .25s,scale .25s;pointer-events:none}
+.cfish .say::after{content:"";position:absolute;top:100%;left:var(--tail,50%);translate:-50% 0;border:7px solid transparent;border-top-color:#fff}
+.cfish.talking .say{opacity:1;scale:1}
+@keyframes cfswim{0%{left:-90px}100%{left:calc(100% + 10px)}}
+@keyframes cfbob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
+@media(max-width:860px){.cflane{left:0;right:0;height:130px}.cfish.f1{top:86px}.cfish.f2{top:50px}}
+@media(max-width:600px){.cfish{width:46px}.cfish.f2{width:38px}.cfish .say{max-width:200px;font-size:12px;padding:6px 9px}.hero{padding-top:92px}.cflane{top:0;height:92px}.cfish.f1{top:60px}.cfish.f2{top:62px}}
+@media(prefers-reduced-motion:reduce){.cfish,.cfish svg{animation:none}.cfish.f1{left:70%}.cfish.f2{left:85%}}
 </style></head><body>
 <header class="top"><div class="wrap">
 <div class="brand"><img src="logo.webp" alt="" width="30" height="35"><span>Bubble Guppies</span></div>
@@ -860,6 +877,45 @@ V.members=()=>{
       ${titles.length?`<div class="small mute" style="margin-top:6px">Titles: ${titles.map(h=>`${sea(h.year)} (${nm(h.champion)})`).join(', ')}</div>`:''}
       ${info.fact?`<div class="small" style="margin-top:6px"><b>Fun fact:</b> ${esc(info.fact)}</div>`:''}</div></div>`}).join('');
   return `<h2>Members</h2><p class="mute" style="margin-top:-6px">The ten managers of the Bubble Guppies. Records, power and odds update live; titles count for the person, whatever their team was called.</p><div class="mgrid">${rows}</div>`};
+// ===== Clownfish commentators in the hero (pure decoration; reads league data, changes nothing) =====
+const CFSVG=`<svg viewBox="0 0 80 46" aria-hidden="true"><path d="M8 23 L-2 10 L1 23 L-2 36 Z" fill="#ff7a1a" stroke="#1b1b1b" stroke-width="2"/><path d="M30 6 Q40 -2 50 7" fill="#ff8c2e" stroke="#1b1b1b" stroke-width="2"/><path d="M34 40 Q42 48 48 39" fill="#ff8c2e" stroke="#1b1b1b" stroke-width="2"/><ellipse cx="40" cy="23" rx="32" ry="17" fill="#ff7a1a" stroke="#1b1b1b" stroke-width="2"/><path d="M56 8 Q50 23 56 38" stroke="#fff" stroke-width="7" fill="none"/><path d="M36 6.5 Q30 23 36 39.5" stroke="#fff" stroke-width="8" fill="none"/><path d="M17 11 Q13 23 17 35" stroke="#fff" stroke-width="6" fill="none"/><path d="M56 8 Q50 23 56 38M36 6.5 Q30 23 36 39.5M17 11 Q13 23 17 35" stroke="#1b1b1b" stroke-width="1" fill="none" opacity=".35"/><circle cx="63" cy="18" r="4.2" fill="#fff" stroke="#1b1b1b" stroke-width="1.5"/><circle cx="64" cy="18" r="2.2" fill="#111"/><path d="M66 28 Q70 30 72 27" stroke="#1b1b1b" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>`;
+function fishLines(){
+  const L=[],R=Math.random,pk=a=>a[Math.floor(R()*a.length)];const sea=y=>`${y-1}–${String(y).slice(2)}`;
+  const tn=t=>String(t||'').replace(/\s+/g,' ').trim();const ps=t=>{t=tn(t);return /s$/i.test(t)?t+"'":t+"'s"};
+  const S=D.standings||[],first=S[0],last=S[S.length-1];
+  if(first)L.push(`${tn(first.team)} is ${rec(first.team)} and already acting like they own the reef.`,`Somebody humble ${tn(first.team)}. ${rec(first.team)} is going to their head.`);
+  if(last)L.push(`${tn(last.team)} is ${rec(last.team)}. Even the plankton feel bad.`,`${tn(last.team)} sits last. Bold strategy: lull everyone into a false sense of security.`);
+  const hs=(H||[]).map(h=>({...h,champion:tn(h.champion),runner_up:tn(h.runner_up),regular_season:tn(h.regular_season)}));
+  const by={};hs.forEach(h=>{const k=h.mkey||h.manager;(by[k]=by[k]||{n:h.manager,w:[],teams:new Set()}).w.push(h);by[k].teams.add(h.champion)});
+  Object.values(by).forEach(g=>{if(g.w.length>=2)L.push(`${g.n} has ${g.w.length} titles. The rest of the league has a combined "next year."`);if(g.teams.size>=2)L.push(`${g.n} won as ${[...g.teams].join(' AND as ')}. New name, same trophy habit.`)});
+  hs.forEach(h=>{if(h.runner_up)L.push(`${h.runner_up} lost the ${sea(h.year)} final. Silver is just gold that tried its best.`);if(h.regular_season&&h.regular_season!==h.champion)L.push(`${h.regular_season} was the regular-season #1 in ${sea(h.year)}... and did not win it all. Peaked in February.`)});
+  const last5=hs.slice(-1)[0];if(last5)L.push(`Defending champ: ${last5.champion}. Everybody is coming for that ring, fish included.`);
+  const mg=D.managers||{},champs=new Set(hs.map(h=>h.mkey).filter(Boolean));
+  T.forEach(t=>{const k=mg[t]?.mkey;if(k&&!champs.has(k)&&hs.length)L.push(`${ps(t)} trophy cabinet is a very nice, very empty shelf.`)});
+  (PW||[]).slice().sort((a,b)=>b.luck-a.luck).slice(0,1).forEach(p=>L.push(`${tn(p.t)} has the luckiest record in the league. Check their pockets for four-leaf seaweed.`));
+  (PW||[]).slice().sort((a,b)=>a.luck-b.luck).slice(0,1).forEach(p=>L.push(`${tn(p.t)} plays like a ${pct(p.apP)} team and gets results like a shipwreck. Cursed.`));
+  try{const K=catBasis();const worst=c=>[...T].sort((a,b)=>K.r(b,c)-K.r(a,c))[0],best=c=>[...T].sort((a,b)=>K.r(a,c)-K.r(b,c))[0];
+    L.push(`${tn(worst('TO'))} turns it over more than I turn around in this tank.`,`${tn(worst('FT%'))} shooting free throws is my favorite comedy show.`,`${tn(best('BLK'))} blocks so many shots, the sharks are scared.`,`${tn(worst('REB'))} rebounds like they're allergic to the ball.`,`${tn(best('3PM'))} jacks up threes like the rim owes them money.`)}catch(e){}
+  try{weekGames(W).forEach(m=>{const r=vs(cat(m,'home'),cat(m,'away'));if(r.w+r.l<3)return;const lead=r.w>=r.l?m.home:m.away,trail=lead===m.home?m.away:m.home,w=Math.max(r.w,r.l),l=Math.min(r.w,r.l);
+    if(w-l>=5)L.push(`${tn(lead)} is up ${w}-${l} on ${tn(trail)}. Someone throw ${tn(trail)} a life jacket.`);else if(w-l<=1)L.push(`${tn(m.home)} vs ${tn(m.away)} is ${w}-${l}. I've stopped blinking. Fish can't blink anyway.`)})}catch(e){}
+  if(typeof ODDS!=='undefined'&&ODDS.res){const O=ODDS.res,o=[...T].sort((a,b)=>O.R[b].po-O.R[a].po);L.push(`My crystal ball (a marble) says ${tn(o[0])} has a ${Math.round(O.R[o[0]].po/O.N*100)}% shot at the playoffs.`,`${tn(o[o.length-1])} has a ${Math.round(O.R[o[o.length-1]].po/O.N*100)}% playoff chance. Not zero! Basically zero.`)}
+  return L}
+const FISHR=['Ouch.','Blub blub. Facts.','I\'m telling them you said that.','Savage. Do another one.','You can\'t say that on the internet!','Bro, they\'re reading this.','HAHAHA. Okay, that one\'s true.','Delete that. No wait, keep it.','I\'m scared to look at the standings now.','Somebody screenshot this.'];
+function fishInit(){const hr=document.getElementById('hero');if(!hr||hr.querySelector('.cflane'))return;
+  const lane=document.createElement('div');lane.className='cflane';lane.setAttribute('aria-hidden','true');
+  lane.innerHTML=`<div class="cfish f1"><div class="say"></div>${CFSVG}</div><div class="cfish f2"><div class="say"></div>${CFSVG}</div>`;hr.appendChild(lane);
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const [a,b]=lane.querySelectorAll('.cfish');let lines=[],used=new Set();
+  const vis=f=>{const x=f.offsetLeft+f.offsetWidth/2;return x>30&&x<lane.clientWidth-30};const talk=(f,txt,ms)=>{const s=f.querySelector('.say');s.textContent=txt;f.classList.add('talking');const W=lane.clientWidth,fx=f.offsetLeft,x=fx+f.offsetWidth/2,bw=s.offsetWidth;const L=Math.max(4,Math.min(W-bw-4,x-bw/2));s.style.left=(L-fx)+'px';s.style.translate='0 0';s.style.setProperty('--tail',(x-L)+'px');f.classList.add('talking');setTimeout(()=>f.classList.remove('talking'),ms)};
+  const next=()=>{if(document.hidden)return;if(!lines.length||used.size>=lines.length){lines=fishLines();used=new Set()}
+    let i;do{i=Math.floor(Math.random()*lines.length)}while(used.has(i)&&used.size<lines.length);used.add(i);
+    let [x,y]=Math.random()<.5?[a,b]:[b,a];if(!vis(x))[x,y]=[y,x];if(!vis(x))return;talk(x,lines[i],6000);setTimeout(()=>talk(y,FISHR[Math.floor(Math.random()*FISHR.length)],3000),6300)};
+  setTimeout(next,2500);setInterval(next,11000)}
+// ===== Grouped navigation: 6 top sections, sub-tabs inside each =====
+const GROUPS=[['home','Home',[['home','Home']]],['gazette','Gazette',[['gazette','Gazette']]],['league','League',[['standings','Standings'],['odds','Odds'],['matchups','Matchups']]],['teamsg','Teams',[['teams','Teams'],['dna','Team DNA'],['members','Members']]],['tradesg','Trades',[['trades','Trade tools'],['players','Players'],['moves','Moves']]],['history','History',[['champions','Champions'],['records','Records']]]];
+const groupOf=v=>GROUPS.find(g=>g[2].some(p=>p[0]===v))||GROUPS[0];
+function navInit(){const n=document.getElementById('nav');if(n)n.innerHTML=GROUPS.map(g=>`<a href="#${g[2][0][0]}" data-g="${g[0]}">${g[1]}</a>`).join('')}
+function subnav(v){const g=groupOf(v);if(g[2].length<2)return '';return `<div class="subnav" role="tablist">${g[2].map(p=>`<a href="#${p[0]}" class="${p[0]===v?'on':''}" role="tab">${p[1]}</a>`).join('')}</div>`}
 let CB='roster';try{CB=localStorage.getItem('bg-cb2')||'roster'}catch(e){}
 function stdLines(){const L={};for(const t of T)L[t]=lineS(rosterOf(t).filter(p=>!hurt(p)).map(std));return L}
 function catBasis(){if(CB==='roster'){const L=stdLines();return{r:(t,c)=>rk(L,t,c),v:(t,c)=>f1(c,L[t][c]),note:`Projected weekly output: the average per-game stats of every active player (IR/OUT left out) × 10 players × 3.5 games, using ${TS.mode==='season'?'season averages (projection if under 3 games)':TS.mode==='recent'?'recent form':'ESPN projections — same as the War Room'}.`}}return{r:(t,c)=>RK[t][c],v:(t,c)=>fmt(c,AV[t][c]),note:'Actual results: average weekly totals from the games played so far'}}
@@ -873,8 +929,8 @@ function route(){
   WORLD=null;try{rerank()}catch(e){console.error(e)}
   const h=location.hash.slice(1);
   if(h==='trades'&&(TS.deals||[]).length&&TS.sub!=='plan')WORLD=planRosters();const v=V[h]?h:'home';
-  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+v));try{const on=document.querySelector('#nav a.on');if(on){const n=on.parentElement;n.scrollTo({left:on.offsetLeft-n.clientWidth/2+on.offsetWidth/2,behavior:'smooth'})}}catch(e){}
-  $('#app').innerHTML=V[v]();
+  const gg=groupOf(v)[0];document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.g===gg));try{const on=document.querySelector('#nav a.on');if(on){const n=on.parentElement;n.scrollTo({left:on.offsetLeft-n.clientWidth/2+on.offsetWidth/2,behavior:'smooth'})}}catch(e){}
+  $('#app').innerHTML=subnav(v)+V[v]();
 }
 document.addEventListener('click',e=>{
   const q=k=>e.target.closest(`[data-${k}]`);let el;
@@ -887,7 +943,7 @@ addEventListener('hashchange',route);
 const LIVE='https://khadranero.github.io/war-room/data.json';
 const getData=()=>fetch('data.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json()}).catch(()=>fetch(LIVE,{cache:'no-store'}).then(r=>r.json()));
 Promise.all([getData(),fetch('history.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]).catch(()=>[])])
- .then(([d,h])=>{D=d;H=(Array.isArray(h)&&h.length)?h:((h&&h.seasons&&h.seasons.length)?h.seasons:(d.history||[]));build();hero();route()})
+ .then(([d,h])=>{D=d;H=(Array.isArray(h)&&h.length)?h:((h&&h.seasons&&h.seasons.length)?h.seasons:(d.history||[]));build();navInit();hero();try{fishInit()}catch(e){console.error(e)}route()})
  .catch(e=>{$('#sub').textContent='Could not load league data.';console.error(e)});
 }
 </script></body></html>
