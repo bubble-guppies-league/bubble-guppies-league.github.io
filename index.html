@@ -97,7 +97,7 @@ tr.cut td{border-bottom:2px dashed var(--coral)}
 .tbar{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--soft)}
 .seg button{border:0;background:none;border-radius:999px;min-height:40px;padding:0 16px;font-weight:700;cursor:pointer;color:var(--mute)}
-.seg button.on{background:var(--sea1);color:#fff}
+.seg button.on{background:var(--sea1);color:#fff}.seg{max-width:100%;overflow-x:auto;scrollbar-width:none}.seg::-webkit-scrollbar{display:none}.seg button{white-space:nowrap;flex:none}
 .chk{display:flex;align-items:center;gap:8px;font-weight:600;min-height:44px}.chk input{width:20px;height:20px;accent-color:var(--sea1)}
 .lab{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:14px}
 select{font:600 16px Barlow,sans-serif;min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 12px}
@@ -218,10 +218,30 @@ nav{-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:li
  .obar{min-width:50px}.oddst td.oc{min-width:52px}.oddst tr>:first-child{display:none}.oddst .tn{max-width:104px}footer,footer *{white-space:normal!important}
  .dnastats{grid-template-columns:repeat(2,1fr)}
 }
+
+.gz{--paper:#f8f3e6;--ink2:#2a2418;background:var(--paper);color:var(--ink2);border-color:#d9cfb4;font-family:Georgia,'Times New Roman',serif}
+.gzfull{border:1px solid #d9cfb4;border-radius:16px;padding:clamp(14px,3vw,30px);box-shadow:0 6px 20px #0001}
+.gz a{color:#7a4b12}.gz b{color:#1e1a12}
+.gzmast{text-align:center;border-bottom:3px double #2a2418;padding-bottom:8px;margin-bottom:12px}
+.gzrule{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font:600 11px/1.4 Georgia,serif;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #2a2418;padding-bottom:5px;color:#5b5240}
+.gzname{font:900 clamp(30px,6.5vw,64px)/1.05 'Old English Text MT','UnifrakturMaguntia',Georgia,serif;letter-spacing:-.5px;margin:8px 0 2px}
+.gzmast.sm .gzname{font-size:clamp(26px,4vw,38px)}.gzmast.sm .gzrule{font-size:10px}
+.gztag{font:italic 13px Georgia,serif;color:#5b5240}
+.gzh{font:800 clamp(20px,3vw,26px)/1.15 Georgia,serif;margin:6px 0 6px;text-transform:none;color:#1e1a12}.gzh.big{font-size:clamp(26px,4.6vw,44px);text-align:center}
+.gzlede{font-size:16px;line-height:1.5;margin:0 0 10px}.gzlead{border-bottom:1px solid #2a2418;padding-bottom:12px;margin-bottom:14px}.gzlead .gzlede{text-align:center;max-width:70ch;margin:0 auto}
+.gzk{font:700 12px Georgia,serif;text-transform:uppercase;letter-spacing:.12em;border-top:2px solid #2a2418;border-bottom:1px solid #2a2418;padding:3px 0;margin-bottom:8px;color:#1e1a12}
+.gzmini{display:grid;grid-template-columns:1fr 1fr;gap:16px}.gzmini p,.gzsec p{font-size:14.5px;line-height:1.5;margin:0 0 9px}
+.gzcols{column-count:3;column-gap:28px;column-rule:1px solid #cbbf9f}.gzsec{break-inside:avoid;margin-bottom:16px}
+.gzs{font:italic 12.5px/1.45 Georgia,serif;color:#6b6250}
+.gzflag{font:700 9px sans-serif;background:#b3261e;color:#fff;border-radius:3px;padding:1px 5px;letter-spacing:.06em;vertical-align:middle;margin-left:6px}
+.gzad{border:1px dashed #a89a78;padding:7px 9px;font-size:13.5px!important}
+.gzt{cursor:pointer;text-decoration:underline;text-decoration-color:#c9b98f;text-underline-offset:2px}
+@media(max-width:900px){.gzcols{column-count:2}}
+@media(max-width:600px){.gzcols{column-count:1}.gzmini{grid-template-columns:1fr}.gzrule{justify-content:center}.gzrule span:last-child{display:none}}
 </style></head><body>
 <header class="top"><div class="wrap">
 <div class="brand"><img src="logo.webp" alt="" width="30" height="35"><span>Bubble Guppies</span></div>
-<nav id="nav"><a href="#home">Home</a><a href="#standings">Standings</a><a href="#odds">Odds</a><a href="#matchups">Matchups</a><a href="#teams">Teams</a><a href="#dna">DNA</a><a href="#players">Players</a><a href="#trades">Trades</a><a href="#moves">Moves</a><a href="#records">Records</a><a href="#champions">Champions</a></nav>
+<nav id="nav"><a href="#home">Home</a><a href="#gazette">Gazette</a><a href="#standings">Standings</a><a href="#odds">Odds</a><a href="#matchups">Matchups</a><a href="#teams">Teams</a><a href="#dna">DNA</a><a href="#players">Players</a><a href="#trades">Trades</a><a href="#moves">Moves</a><a href="#records">Records</a><a href="#champions">Champions</a></nav>
 </div></header>
 <section class="hero" id="hero"><div class="wrap">
 <div class="herohead"><img class="herologo" src="logo.webp" alt="Bubble Guppies Fantasy League logo"><div><h1>Bubble Guppies</h1>
@@ -295,7 +315,7 @@ function feed(list,n){
 const V={
 home(){
   const top=PW.slice(0,3).map(p=>`<div class="brow"><b class="big" style="font-size:22px">${p.rank}</b>${tlink(p.t)}<span class="small mute" style="text-align:right">${p.pts} pts</span></div>`).join('');
-  return `<div class="cols"><div class="card"><h2>Standings</h2>${standTable(false)}</div><div class="stack2"><div class="card"><h2>Power top 3</h2>${cbBar()}${top}<p class="small mute">Points for where a team places in each category (10 for 1st, 1 for last), added up across all 9. Based on ${CB==='roster'?'current rosters':'finished weeks'}, same as the War Room.</p></div><div class="card"><h2>Playoff chances</h2>${oddsMini()}</div><div class="card"><h2>Latest moves</h2>${feed(D.log||[],8)}</div></div></div>`},
+  return `<div class="cols"><div><div class="card"><h2>Standings</h2>${standTable(false)}</div>${gzHome()}</div><div class="stack2"><div class="card"><h2>Power top 3</h2>${cbBar()}${top}<p class="small mute">Points for where a team places in each category (10 for 1st, 1 for last), added up across all 9. Based on ${CB==='roster'?'current rosters':'finished weeks'}, same as the War Room.</p></div><div class="card"><h2>Playoff chances</h2>${oddsMini()}</div><div class="card"><h2>Latest moves</h2>${feed(D.log||[],8)}</div></div></div>`},
 standings(){
   const K=catBasis();const heat=T.map(t=>`<tr><td class="tl">${tlink(t)}</td>${CATS.map(c=>{const r=K.r(t,c);const a=(T.length-r)/(T.length-1);return `<td style="background:color-mix(in srgb,var(--aqua) ${Math.round(a*55)}%,transparent)">${K.v(t,c)}<span class="small mute"> ${r}</span></td>`}).join('')}</tr>`).join('');
   return `<div class="card"><h2>League table</h2>${standTable(true)}</div><div class="card" style="margin-top:18px"><h2>Category strength</h2>${cbBar()}<p class="small mute">${CB==='roster'?K.note:`Average weekly totals${DONE.length?` over ${DONE.length} completed weeks`:''}`}; small number is league rank, darker is better.</p><div class="scroll"><table class="heat"><thead><tr><th class="tl">Team</th>${CATS.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${heat}</tbody></table></div></div>`},
@@ -694,7 +714,7 @@ function runOdds(done){
   step()}
 function oddsKey(){return [D.updated,CB,TS.mode].join('|')}
 function oddsEnsure(){const key=oddsKey();if(ODDS.key===key&&ODDS.res)return ODDS.res;if(ODDS.busy===key)return null;ODDS.busy=key;
-  runOdds(r=>{ODDS.busy=false;ODDS.key=key;ODDS.res=r;const h=location.hash.slice(1);if(h==='odds'||h==='home'||h===''||h==='standings')route()});return null}
+  runOdds(r=>{ODDS.busy=false;ODDS.key=key;ODDS.res=r;const h=location.hash.slice(1);if(h==='odds'||h==='home'||h===''||h==='standings'||h==='gazette')route()});return null}
 const pc=(x,N)=>{const v=x/N*100;return v>=99.95?'>99.9%':v>0&&v<0.1?'<0.1%':v.toFixed(v<10&&v>0?1:0)+'%'};
 function obar(x,N,col){const v=Math.round(x/N*100);return `<div class="obar"><i style="width:${v}%;background:${col||'var(--teal,#14b8a6)'}"></i><span>${pc(x,N)}</span></div>`}
 V.odds=()=>{const S=oddsEnsure();
@@ -716,6 +736,98 @@ V.odds=()=>{const S=oddsEnsure();
   <div class="card" style="margin-top:18px"><h2>Seed chances</h2><div class="scroll"><table class="seedt"><thead><tr><th class="tl">Team</th>${T.map((_,i)=>`<th>${i+1}</th>`).join('')}</tr></thead><tbody>${seeds}</tbody></table></div><p class="small mute">Percent chance of finishing in each final standings spot. Darker = more likely.</p></div>`};
 function oddsMini(){const S=oddsEnsure();if(!S)return `<p class="small mute">Simulating the season…</p>`;const {R,N}=S;
   return [...T].sort((a,b)=>R[b].po-R[a].po||R[b].wins-R[a].wins).map(t=>`<div class="omini">${tlink(t)}${obar(R[t].po,N)}</div>`).join('')+`<p class="small mute" style="margin-top:8px">Playoff chances · <a href="#odds">full season odds →</a></p>`}
+// ===== The Bubble Gazette: a daily, auto-written league newspaper (satire; read-only, changes nothing) =====
+function gzDay(){const f=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Beirut',year:'numeric',month:'2-digit',day:'2-digit'});return f.format(new Date())}
+function gzRng(seed){let h=1779033703^seed.length;for(let i=0;i<seed.length;i++){h=Math.imul(h^seed.charCodeAt(i),3432918353);h=h<<13|h>>>19}
+  return()=>{h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);return((h^=h>>>16)>>>0)/4294967296}}
+const GZN=t=>`<b class="gzt" data-team="${esc(t)}">${nm(t)}</b>`;
+const GZP=n=>`<b>${esc(n)}</b>`;
+function gzFill(s,o){return s.replace(/\{(\w+)\}/g,(m,k)=>o[k]??m)}
+function gazette(){
+  const day=gzDay(),R=gzRng(day+'|'+W),pick=a=>a[Math.floor(R()*a.length)];const POOL=new Map();const pickU=a=>{let q=POOL.get(a);if(!q||!q.length){q=a.map(x=>[R(),x]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);POOL.set(a,q)}return q.pop()};try{oddsEnsure()}catch(e){}
+  const K=catBasis(),n=T.length,CN=typeof CATN!=='undefined'?CATN:{};const cn=c=>CN[c]||c;
+  const games=weekGames(W),left=D.games?.days_left;
+  const live=games.some(m=>CATS.some(c=>(m.cats?.[c]?.home||0)>0));
+  const L=stdLines();
+  // ---- matchups
+  const mus=games.map(m=>{const a=m.home,b=m.away;const sa=live?cat(m,'home'):L[a],sb=live?cat(m,'away'):L[b];const r=vs(sa,sb);
+    const lead=r.w>=r.l?a:b,trail=lead===a?b:a,w=Math.max(r.w,r.l),l=Math.min(r.w,r.l);
+    const sw=CATS.filter(c=>sa[c]!=null&&sb[c]!=null).map(c=>{const x=+sa[c],y=+sb[c];return{c,d:Math.abs(x-y)/((Math.abs(x)+Math.abs(y))/2||1)}}).sort((p,q)=>p.d-q.d);
+    return{a,b,lead,trail,w,l,t:r.t,m:w-l,swing:cn(sw[0]?.c||'FT%'),swing2:cn(sw[1]?.c||'TO')}});
+  const BLOW=['{lead} is up {w}-{l} on {trail}. Eyewitnesses describe it less as a matchup and more as a public service announcement.','{lead} leads {trail} {w}-{l}. {trail} has asked whether the mercy rule applies to fantasy basketball. It does not.','{lead} {w}, {trail} {l}. Local lifeguards have been called to rescue {trail} from the deep end.','{trail} trails {lead} {w}-{l}. The front office has issued a statement reading, in full, "We are aware."'];
+  const CLOSE=['{a} and {b} are deadlocked {w}-{l}. It will come down to {swing}, so nobody blink, sneeze, or check the box score at dinner.','Too close to call: {a} vs {b}, {w}-{l}. Experts say {swing} decides it. Other experts say {swing2}. All experts are guessing.','{a} vs {b} is a {w}-{l} knife fight. {swing} is within a single good night of flipping. Bring snacks.','A coin would be envious: {a} and {b} sit at {w}-{l}. The swing category is {swing}, and both managers are refreshing the app at a medically concerning rate.'];
+  const MID=['{lead} holds a {w}-{l} edge over {trail}, but {trail} still has {days} and a dream. The dream is mostly {swing}.','{lead} up {w}-{l} on {trail}. Comfortable? Not with {swing} this close. Sweat level: moderate.','{lead} leads {trail} {w}-{l}. {trail} needs {swing} and {swing2} to break right, plus a minor miracle.'];
+  const daysTxt=left!=null?`${left} day${left===1?'':'s'} left`:'a few days left';
+  mus.forEach(x=>{const tpl=x.m>=5?BLOW:x.m<=1?CLOSE:MID;x.txt=gzFill(pickU(tpl),{lead:GZN(x.lead),trail:GZN(x.trail),a:GZN(x.a),b:GZN(x.b),w:x.w,l:x.l,swing:`<i>${x.swing}</i>`,swing2:`<i>${x.swing2}</i>`,days:daysTxt});x.kind=x.m>=5?'blow':x.m<=1?'close':'mid'});
+  const big=[...mus].sort((p,q)=>q.m-p.m)[0],tight=[...mus].sort((p,q)=>p.m-q.m)[0];
+  // ---- headline
+  const HL=[];
+  if(big&&big.m>=5)HL.push({h:pick([`${nm(big.lead)} Bulldozes ${nm(big.trail)}, ${big.w}-${big.l}`,`Massacre at the Aquarium: ${nm(big.lead)} ${big.w}, ${nm(big.trail)} ${big.l}`,`${nm(big.trail)} Reported Missing; Last Seen Down ${big.w}-${big.l}`]),d:big.txt});
+  if(tight&&tight.m<=1)HL.push({h:pick([`Nail-Biter: ${nm(tight.a)} and ${nm(tight.b)} Locked at ${tight.w}-${tight.l}`,`League Holds Its Breath as ${nm(tight.a)} vs ${nm(tight.b)} Goes Down to the Wire`]),d:tight.txt});
+  const lead1=D.standings[0];HL.push({h:pick([`${nm(lead1.team)} Sits Atop the Reef at ${rec(lead1.team)}`,`View From the Top: ${nm(lead1.team)} Leads the League`]),d:`${GZN(lead1.team)} leads the Bubble Guppies standings at ${rec(lead1.team)}. Everybody else is, statistically speaking, chasing.`});
+  const head=HL[0];
+  // ---- trade rumors (complementary needs)
+  const RK2={};T.forEach(t=>{RK2[t]={};CATS.forEach(c=>RK2[t][c]=K.r(t,c))});
+  const act=t=>rosterOf(t).filter(p=>!hurt(p)).map(p=>({p,s:std(p)})).filter(x=>x.s&&x.s.PTS!=null);
+  const pairs=[];for(const a of T)for(const b of T){if(a>=b)continue;
+    const ca=CATS.filter(c=>RK2[a][c]>=n-3&&RK2[b][c]<=4).sort((x,y)=>RK2[b][x]-RK2[b][y])[0],cb=CATS.filter(c=>RK2[b][c]>=n-3&&RK2[a][c]<=4).sort((x,y)=>RK2[a][x]-RK2[a][y])[0];
+    if(ca&&cb)pairs.push({a,b,ca,cb,sc:(RK2[a][ca]-RK2[b][ca])+(RK2[b][cb]-RK2[a][cb])+R()*3})}
+  pairs.sort((x,y)=>y.sc-x.sc);
+  const used=new Set(),rum=[];
+  const best=(t,c)=>act(t).filter(x=>x.s[c]!=null).sort((x,y)=>LOW[c]?x.s[c]-y.s[c]:y.s[c]-x.s[c])[0];
+  const fv=(c,v)=>PCT[c]?(+v>1?+v/100:+v).toFixed(3).replace(/^0/,''):(+v).toFixed(1);
+  const RUM=['Sources say {A} has called {B} {k} times this week about {pb}. {A} ranks {ra} in {ca}, and {pb} puts up {va}. {B} would want {pa} ({vb} {cb}) in return. Both sides deny everything, which is exactly what people about to trade say.','{A} was spotted outside {B}\'s office holding a fruit basket and a printout of {pb}\'s {ca} numbers ({va}). {B} is said to be "intrigued" by {pa}, who would fix their {rb} in {cb}.','Whispers from the reef: {A} wants {pb} to patch up their {ra} in {ca}. {B} reportedly countered with "only if {pa} is in it." Talks are described as "spicy."','A {A} executive was overheard muttering "{pb}, {pb}, {pb}" in the parking lot. {B}, sitting {rb} in {cb}, has been eyeing {pa}. Stay tuned. Or don\'t. We\'re a newspaper, not a cop.'];
+  for(const x of pairs){if(rum.length>=3)break;if(used.has(x.a)||used.has(x.b))continue;const pb=best(x.b,x.ca),pa=best(x.a,x.cb);if(!pb||!pa)continue;used.add(x.a);used.add(x.b);
+    rum.push(gzFill(pickU(RUM),{A:GZN(x.a),B:GZN(x.b),pb:GZP(pb.p.name),pa:GZP(pa.p.name),ca:cn(x.ca),cb:cn(x.cb),va:fv(x.ca,pb.s[x.ca])+' '+x.ca,vb:fv(x.cb,pa.s[x.cb]),ra:ord(RK2[x.a][x.ca]),rb:ord(RK2[x.b][x.cb]),k:2+Math.floor(R()*9)}))}
+  // ---- waiver wire
+  const moves=(D.log||[]).slice(0,40);const adds=moves.filter(x=>/ADD/.test(x.action)).slice(0,4),drops=moves.filter(x=>/DROP/.test(x.action)).slice(0,3);
+  const ADD=['{t} scooped up {p} off the wire. The front office calls it "franchise-altering." The franchise has not been consulted.','{t} added {p}. Season tickets have reportedly sold out (there are no season tickets).','{p} joins {t}. Welcome to the fish tank, kid.','{t} grabbed {p} while everyone else was asleep. Hustle never sleeps. Apparently neither does {t}.'];
+  const DROP=['{p} was released by {t}. Sources say he is taking it well and has already updated his LinkedIn.','{t} cut ties with {p}. No hard feelings, just hard numbers.','{p} has been sent back to the open ocean by {t}. Swim free, {p}.'];
+  const ww=[...adds.map(x=>gzFill(pickU(ADD),{t:GZN(x.team),p:GZP(x.player)})),...drops.map(x=>gzFill(pickU(DROP),{t:GZN(x.team),p:GZP(x.player)}))];
+  const cnt={};(D.log||[]).forEach(x=>{if(/ADD/.test(x.action))cnt[x.team]=(cnt[x.team]||0)+1});const busy=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+  // ---- injuries
+  const inj=[];T.forEach(t=>rosterOf(t).forEach(p=>{if(p.injury&&p.injury!=='ACTIVE')inj.push({p,t})}));
+  const INJ=['{p} ({t}) is listed {s}. The team\'s medical staff (one guy with a bag of ice) remains optimistic.','{p} is {s} for {t}. Thoughts and prayers to {t}\'s FG% and their manager\'s blood pressure.','{t} confirms {p} is {s}. The bench has been told to "step up," which it has received as a personal attack.'];
+  const injs=inj.sort(()=>R()-.5).slice(0,3).map(x=>gzFill(pickU(INJ),{p:GZP(x.p.name),t:GZN(x.t),s:x.p.injury==='OUT'?'OUT':'day-to-day'}));
+  // ---- luck
+  const lk=[...PW].sort((a,b)=>b.luck-a.luck);const lucky=lk[0],unlucky=lk[lk.length-1];
+  // ---- classifieds
+  const CL=[];const wk=t=>CATS.slice().sort((x,y)=>RK2[t][y]-RK2[t][x])[0],st=t=>CATS.slice().sort((x,y)=>RK2[t][x]-RK2[t][y])[0];
+  const sh=[...T].sort(()=>R()-.5);
+  const WANT=['WANTED: {c}. Any {c}. Will pay in bench players and good vibes. Contact {t}.','LOST: our {c}. Last seen in Week 1. Reward offered. — {t}','HELP WANTED: experienced {c} producer. Must be healthy. Must actually play. — {t}'];
+  const SALE=['FOR SALE: surplus {c}, gently used, ranked {r} in the league. Serious offers only. — {t}','OVERSTOCKED: {t} has more {c} than it knows what to do with. Make an offer.'];
+  CL.push(gzFill(pickU(WANT),{c:cn(wk(sh[0])),t:GZN(sh[0])}),gzFill(pickU(SALE),{c:cn(st(sh[1])),r:ord(RK2[sh[1]][st(sh[1])]),t:GZN(sh[1])}),gzFill(pickU(WANT),{c:cn(wk(sh[2])),t:GZN(sh[2])}));
+  // ---- stat of the day
+  const sc=pick(CATS);const sl=[...T].sort((a,b)=>RK2[a][sc]-RK2[b][sc])[0];const sp=best(sl,sc);
+  // ---- forecast
+  const O=(typeof ODDS!=='undefined'&&ODDS.res)?ODDS.res:null;let fc='';
+  if(O){const ord2=[...T].sort((a,b)=>O.R[b].po-O.R[a].po);const f=t=>Math.round(O.R[t].po/O.N*100);
+    fc=`<p>${pick(['Sunny skies','Clear and bright','Warm currents'])} over ${GZN(ord2[0])}: ${f(ord2[0])}% chance of playoffs.</p><p>${pick(['Scattered doubt','Light drizzle of panic','Overcast with a chance of tanking'])} for ${GZN(ord2[n-1])}: ${f(ord2[n-1])}%.</p><p>Bubble watch: ${ord2.filter(t=>{const v=f(t);return v>=30&&v<=70}).slice(0,3).map(GZN).join(', ')||'nobody, oddly'}.</p><p class="gzs"><a href="#odds">Full forecast →</a></p>`}
+  else fc='<p>Our meteorologist is still running the numbers. Check back in a second.</p>';
+  // ---- history
+  const hs=(H||[]).length?pick(H):null;const hist=hs?`${hs.year-1}–${String(hs.year).slice(2)}: ${esc(hs.manager||'')}${hs.manager?"'s ":''}<b>${nm(hs.champion)}</b> won it all${hs.record&&hs.record!=='0-0'?` after going ${esc(hs.record)}`:''}${hs.runner_up?`, leaving ${nm(hs.runner_up)} to think about what could have been`:''}.`:'';
+  const no=Math.max(1,Math.round((Date.parse(day)-Date.parse('2026-10-20'))/864e5));
+  return{day,no,head,mus,rum,ww,busy,injs,lucky,unlucky,CL,sc,sl,sp,fc,hist,live,fv}}
+function gzMast(G,small){const dt=new Date(G.day+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  return `<div class="gzmast${small?' sm':''}"><div class="gzrule"><span>Vol. 2026–27 · No. ${G.no}</span><span>${esc(dt)}</span><span>Price: one goldfish cracker</span></div><div class="gzname">The Bubble Gazette</div><div class="gztag">All the news that fits in a fish tank · Week ${W} edition</div></div>`}
+function gzHome(){let G;try{G=gazette()}catch(e){console.error(e);return ''}
+  return `<div class="card gz" style="margin-top:18px">${gzMast(G,true)}<h3 class="gzh">${G.head.h}</h3><p class="gzlede">${G.head.d}</p>
+  <div class="gzmini"><div><div class="gzk">Rumor mill</div><p>${G.rum[0]||'Quiet on the trade front. Too quiet.'}</p></div><div><div class="gzk">Around the reef</div><p>${(G.mus.find(m=>m!==G.mus[0])||G.mus[0]||{}).txt||''}</p></div></div>
+  <p class="gzs"><a href="#gazette">Read today's full edition →</a></p></div>`}
+V.gazette=()=>{const G=gazette();const b=(k,inner)=>`<section class="gzsec"><div class="gzk">${k}</div>${inner}</section>`;
+  return `<div class="gz gzfull">${gzMast(G,false)}
+  <div class="gzlead"><h2 class="gzh big">${G.head.h}</h2><p class="gzlede">${G.head.d}</p></div>
+  <div class="gzcols">
+   ${b(G.live?'Matchup desk: this week so far':'Matchup desk: week preview',G.mus.map(m=>`<p>${m.txt}</p>`).join(''))}
+   ${b('Rumor mill <span class="gzflag">100% made up</span>',(G.rum.length?G.rum.map(r=>`<p>${r}</p>`).join(''):'<p>No rumors today. The phones are suspiciously quiet.</p>')+'<p class="gzs">Rumors are invented by a computer with too much free time. Real deals go through the Trades tab.</p>')}
+   ${b('Waiver wire',G.ww.map(x=>`<p>${x}</p>`).join('')+(G.busy?`<p class="gzs">Busiest front office: ${GZN(G.busy[0])}, ${G.busy[1]} pickups this season. Somebody take away their phone.</p>`:''))}
+   ${b('Injury report',G.injs.map(x=>`<p>${x}</p>`).join('')||'<p>Everyone is healthy. Suspicious.</p>')}
+   ${b('The luck column',`<p>Luckiest team in the league: ${GZN(G.lucky.t)}, ${rec(G.lucky.t)} with an all-play win rate of ${pct(G.lucky.apP)}. Somebody check their socks.</p><p>Cursed: ${GZN(G.unlucky.t)} has the all-play numbers of a ${pct(G.unlucky.apP)} team and the record of ${rec(G.unlucky.t)}. The universe owes them one.</p>`)}
+   ${b('Playoff weather',G.fc)}
+   ${b('Stat of the day',`<p>${GZN(G.sl)} leads the league in <b>${esc(G.sc)}</b>.${G.sp?` Chief suspect: ${GZP(G.sp.p.name)}, at ${G.fv(G.sc,G.sp.s[G.sc])} a game.`:''}</p>`)}
+   ${b('Classifieds',G.CL.map(x=>`<p class="gzad">${x}</p>`).join(''))}
+   ${G.hist?b('From the archives',`<p>${G.hist}</p>`):''}
+  </div><p class="gzs" style="text-align:center;margin-top:14px">A new edition prints every day. The Gazette is satire, written automatically from league data. No fish were harmed.</p></div>`};
 let CB='roster';try{CB=localStorage.getItem('bg-cb2')||'roster'}catch(e){}
 function stdLines(){const L={};for(const t of T)L[t]=lineS(rosterOf(t).filter(p=>!hurt(p)).map(std));return L}
 function catBasis(){if(CB==='roster'){const L=stdLines();return{r:(t,c)=>rk(L,t,c),v:(t,c)=>f1(c,L[t][c]),note:`Projected weekly output: the average per-game stats of every active player (IR/OUT left out) × 10 players × 3.5 games, using ${TS.mode==='season'?'season averages (projection if under 3 games)':TS.mode==='recent'?'recent form':'ESPN projections — same as the War Room'}.`}}return{r:(t,c)=>RK[t][c],v:(t,c)=>fmt(c,AV[t][c]),note:'Actual results: average weekly totals from the games played so far'}}
