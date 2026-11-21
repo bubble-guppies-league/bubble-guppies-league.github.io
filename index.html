@@ -195,10 +195,33 @@ footer{padding:24px 0 40px;color:var(--mute);font-size:13px;text-align:center}
 .dtrack{grid-column:1/-1;position:relative;height:6px;border-radius:3px;background:var(--line)}.dtrack i{position:absolute;top:0;height:100%;border-radius:3px}
 .heatt td.heat{font-weight:700;color:#1d2b2a;text-align:center;min-width:34px}
 @media(max-width:560px){.dnabody{flex-direction:column;align-items:stretch}.dnabody .radar{margin:0 auto}.dnagrid{grid-template-columns:1fr}}
+
+.obar{position:relative;height:22px;min-width:92px;border-radius:6px;background:var(--line);overflow:hidden}
+.obar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;opacity:.85}
+.obar span{position:relative;display:block;text-align:center;font:600 12px/22px Fredoka,sans-serif}
+.oddst td.oc{min-width:96px}.seedt td.sd{text-align:center;font-weight:600;min-width:30px}.seedt td.sdcut{border-right:2px dashed var(--mute)}
+.omini{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:10px;align-items:center;margin:6px 0}
+.omini .tn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.tnn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.tn{min-width:0}
+.scroll tr>td.tl:first-child,.scroll tr>th.tl:first-child{position:sticky;left:0;z-index:1;background:var(--card)}
+nav{-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
+@media(max-width:600px){
+ .hero{padding:16px 0 18px}.hero h1{font-size:34px}.herologo{width:64px}.hero .sub{margin:4px 0 12px;font-size:13px}
+ #board{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;margin:0 -14px;padding:0 14px 6px;scrollbar-width:none}#board::-webkit-scrollbar{display:none}
+ #board .mc{flex:0 0 84%;scroll-snap-align:center;padding:11px}
+ .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:-14px;margin-right:-14px;padding:0 14px 4px}.chips::-webkit-scrollbar{display:none}.chip{flex:none;min-height:40px;padding:0 13px}
+ .seg{max-width:100%;overflow-x:auto;scrollbar-width:none}.seg::-webkit-scrollbar{display:none}.seg button{white-space:nowrap;font-size:13px;padding:0 11px;min-height:36px;flex:none}
+ .scroll .tn{max-width:136px}.scroll .tn .av{width:22px;height:22px;font-size:9px}
+ .card{padding:14px}h2{font-size:22px}
+ .hide-sm{display:none}
+ .obar{min-width:50px}.oddst td.oc{min-width:52px}.oddst tr>:first-child{display:none}.oddst .tn{max-width:104px}footer,footer *{white-space:normal!important}
+ .dnastats{grid-template-columns:repeat(2,1fr)}
+}
 </style></head><body>
 <header class="top"><div class="wrap">
 <div class="brand"><img src="logo.webp" alt="" width="30" height="35"><span>Bubble Guppies</span></div>
-<nav id="nav"><a href="#home">Home</a><a href="#standings">Standings</a><a href="#matchups">Matchups</a><a href="#teams">Teams</a><a href="#dna">DNA</a><a href="#players">Players</a><a href="#trades">Trades</a><a href="#moves">Moves</a><a href="#records">Records</a><a href="#champions">Champions</a></nav>
+<nav id="nav"><a href="#home">Home</a><a href="#standings">Standings</a><a href="#odds">Odds</a><a href="#matchups">Matchups</a><a href="#teams">Teams</a><a href="#dna">DNA</a><a href="#players">Players</a><a href="#trades">Trades</a><a href="#moves">Moves</a><a href="#records">Records</a><a href="#champions">Champions</a></nav>
 </div></header>
 <section class="hero" id="hero"><div class="wrap">
 <div class="herohead"><img class="herologo" src="logo.webp" alt="Bubble Guppies Fantasy League logo"><div><h1>Bubble Guppies</h1>
@@ -220,7 +243,7 @@ let D,H=[],CATS,T,ST,G={},WK={},AP={},AV={},RK={},PW=[],PWR={},W,DONE=[],team=nu
 const hash=s=>[...s].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7);
 const av=(t,cls='')=>{const s=ST[t]||{};const ini=String(t).trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();return `<span class="av ${cls}" style="background:hsl(${HUES[Math.abs(hash(t))%HUES.length]} 55% 38%)">${esc(ini)}${(s.logo_data||s.logo)?`<img src="${esc(s.logo_data||s.logo)}" alt="" loading="lazy" onerror="this.remove()">`:''}</span>`};
 const rec=t=>{const s=ST[t];return s?`${s.wins}-${s.losses}${s.ties?'-'+s.ties:''}`:''};
-const tlink=t=>`<span class="tn" data-team="${esc(t)}">${av(t)}${nm(t)}</span>`;
+const tlink=t=>`<span class="tn" data-team="${esc(t)}">${av(t)}<span class="tnn">${nm(t)}</span></span>`;
 function vs(a,b){let w=0,l=0,t=0;for(const c of CATS){const x=a[c],y=b[c];if(x==null||y==null)continue;if(x===y)t++;else if(LOW[c]?x<y:x>y)w++;else l++}return{w,l,t}}
 
 function build(){
@@ -272,7 +295,7 @@ function feed(list,n){
 const V={
 home(){
   const top=PW.slice(0,3).map(p=>`<div class="brow"><b class="big" style="font-size:22px">${p.rank}</b>${tlink(p.t)}<span class="small mute" style="text-align:right">${p.pts} pts</span></div>`).join('');
-  return `<div class="cols"><div class="card"><h2>Standings</h2>${standTable(false)}</div><div class="stack2"><div class="card"><h2>Power top 3</h2>${cbBar()}${top}<p class="small mute">Points for where a team places in each category (10 for 1st, 1 for last), added up across all 9. Based on ${CB==='roster'?'current rosters':'finished weeks'}, same as the War Room.</p></div><div class="card"><h2>Latest moves</h2>${feed(D.log||[],8)}</div></div></div>`},
+  return `<div class="cols"><div class="card"><h2>Standings</h2>${standTable(false)}</div><div class="stack2"><div class="card"><h2>Power top 3</h2>${cbBar()}${top}<p class="small mute">Points for where a team places in each category (10 for 1st, 1 for last), added up across all 9. Based on ${CB==='roster'?'current rosters':'finished weeks'}, same as the War Room.</p></div><div class="card"><h2>Playoff chances</h2>${oddsMini()}</div><div class="card"><h2>Latest moves</h2>${feed(D.log||[],8)}</div></div></div>`},
 standings(){
   const K=catBasis();const heat=T.map(t=>`<tr><td class="tl">${tlink(t)}</td>${CATS.map(c=>{const r=K.r(t,c);const a=(T.length-r)/(T.length-1);return `<td style="background:color-mix(in srgb,var(--aqua) ${Math.round(a*55)}%,transparent)">${K.v(t,c)}<span class="small mute"> ${r}</span></td>`}).join('')}</tr>`).join('');
   return `<div class="card"><h2>League table</h2>${standTable(true)}</div><div class="card" style="margin-top:18px"><h2>Category strength</h2>${cbBar()}<p class="small mute">${CB==='roster'?K.note:`Average weekly totals${DONE.length?` over ${DONE.length} completed weeks`:''}`}; small number is league rank, darker is better.</p><div class="scroll"><table class="heat"><thead><tr><th class="tl">Team</th>${CATS.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${heat}</tbody></table></div></div>`},
@@ -648,6 +671,51 @@ V.dna=()=>{const X=dnaData();
   <h2 style="margin-top:26px">Every team's profile</h2><div class="dnagrid">${[...T].sort((a,b)=>X[b].pts-X[a].pts).map(t=>dnaCard(t,X[t])).join('')}</div>
   <h2 style="margin-top:26px">Around the league</h2>${dnaLeaders(X)}`};
 document.addEventListener('change',e=>{const id=e.target.id;if(id==='dnaa')DNA.a=e.target.value;else if(id==='dnab')DNA.b=e.target.value;else return;dsave();route()});
+// ===== Season odds: same simulator as the War Room (rest-of-season Monte Carlo on projected weekly lines) =====
+const ODDS={key:'',res:null,busy:false};
+function oddsSD(B){const by={};CATS.forEach(c=>by[c]={});
+  (D.matchups||[]).filter(m=>m.cats).forEach(m=>['home','away'].forEach(s=>{const t=m[s];CATS.forEach(c=>{let v=m.cats[c]&&m.cats[c][s];if(typeof v!=='number')return;if(PCT[c]&&v>1)v/=100;(by[c][t]=by[c][t]||[]).push(v)})}));
+  const SD={};CATS.forEach(c=>{let ss=0,df=0;Object.values(by[c]).forEach(a=>{if(a.length<2)return;const m=a.reduce((x,y)=>x+y,0)/a.length;ss+=a.reduce((x,y)=>x+(y-m)*(y-m),0);df+=a.length-1});
+    const typ=T.reduce((s,t)=>s+(B[t][c]||0),0)/T.length;SD[c]=Math.max(df>0?Math.sqrt(ss/df):0,0.08*typ)});return SD}
+function gss(){let u=0,w=0;while(!u)u=Math.random();while(!w)w=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(6.283185307*w)}
+function runOdds(done){
+  const B=CB==='season'?Object.fromEntries(T.map(t=>[t,Object.fromEntries(CATS.map(c=>{const v=AV[t][c];return [c,v==null?null:(PCT[c]&&v>1?v/100:v)]}))])):stdLines(),SD=oddsSD(B),sch=D.schedule||{},po=(D.settings&&+D.settings.playoff_teams)||6,n=T.length;
+  const rec={};(D.standings||[]).forEach(s=>rec[s.team]=s.wins+0.5*(s.ties||0));
+  const w0=Math.max(0,(D.week||1)-1),wk=Math.min(17,Object.values(sch)[0]?Object.values(sch)[0].length:0);
+  const play=(a,b)=>{let wa=0,wb=0;for(const c of CATS){if(B[a][c]==null||B[b][c]==null)continue;const x=B[a][c]+SD[c]*gss(),y=B[b][c]+SD[c]*gss();if(x===y)continue;if(LOW[c]?x<y:x>y)wa++;else wb++}return wa>wb?1:wa<wb?0:.5};
+  const R={};T.forEach(t=>R[t]={po:0,top2:0,top1:0,last:0,wins:0,seed:Array(n).fill(0),ws:[]});
+  const N=4000;let k=0;
+  const step=()=>{const end=Math.min(N,k+400);
+    for(;k<end;k++){const W={};T.forEach(t=>W[t]=rec[t]||0);
+      for(let w=w0;w<wk;w++){const seen=new Set();for(const t of T){const o=(sch[t]||[])[w];if(!o||!B[o]||seen.has(t)||seen.has(o))continue;seen.add(t);seen.add(o);const r=play(t,o);W[t]+=r;W[o]+=1-r}}
+      const ord=[...T].sort((a,b)=>(W[b]+Math.random()*.01)-(W[a]+Math.random()*.01));
+      ord.forEach((t,i)=>{const x=R[t];x.seed[i]++;if(i<po)x.po++;if(i<2)x.top2++;if(i===0)x.top1++;if(i===n-1)x.last++;x.wins+=W[t];if(k%4===0)x.ws.push(W[t])})}
+    if(k<N)setTimeout(step,0);else{T.forEach(t=>{const x=R[t];x.ws.sort((a,b)=>a-b);x.lo=x.ws[Math.floor(x.ws.length*.1)];x.hi=x.ws[Math.floor(x.ws.length*.9)];x.ws=null});done({R,N,po,left:Math.max(0,wk-w0),wk})}};
+  step()}
+function oddsKey(){return [D.updated,CB,TS.mode].join('|')}
+function oddsEnsure(){const key=oddsKey();if(ODDS.key===key&&ODDS.res)return ODDS.res;if(ODDS.busy===key)return null;ODDS.busy=key;
+  runOdds(r=>{ODDS.busy=false;ODDS.key=key;ODDS.res=r;const h=location.hash.slice(1);if(h==='odds'||h==='home'||h===''||h==='standings')route()});return null}
+const pc=(x,N)=>{const v=x/N*100;return v>=99.95?'>99.9%':v>0&&v<0.1?'<0.1%':v.toFixed(v<10&&v>0?1:0)+'%'};
+function obar(x,N,col){const v=Math.round(x/N*100);return `<div class="obar"><i style="width:${v}%;background:${col||'var(--teal,#14b8a6)'}"></i><span>${pc(x,N)}</span></div>`}
+V.odds=()=>{const S=oddsEnsure();
+  const head=`<h2>Season odds</h2><p class="mute" style="margin-top:-6px">Every remaining matchup simulated thousands of times from each team's projected week, with each category's real week-to-week swing from this season's matchups. Same simulator as the War Room.</p>${cbBar()}`;
+  if(!S)return head+`<div class="card" style="margin-top:14px"><p class="mute">Simulating the rest of the season…</p></div>`;
+  const {R,N,po,left}=S,n=T.length;
+  const ord=[...T].sort((a,b)=>R[b].wins-R[a].wins||R[b].po-R[a].po);
+  const rows=ord.map((t,i)=>{const x=R[t];const s=ST[t];return `<tr class="${i===po-1?'cut':''}"><td>${i+1}</td><td class="tl">${tlink(t)}<div class="small mute">${rec(t)} now</div></td><td><b>${(x.wins/N).toFixed(1)}</b><div class="small mute">${x.lo}–${x.hi}</div></td><td class="oc">${obar(x.po,N)}</td><td class="oc">${obar(x.top2,N,'#f59e0b')}</td><td class="oc hide-sm">${obar(x.top1,N,'#eab308')}</td><td class="hide-sm">${pc(x.last,N)}</td></tr>`}).join('');
+  const heat=v=>{const f=Math.min(1,v/.6);return `background:hsla(172 70% 40% / ${(.08+f*.8).toFixed(2)})`};
+  const seeds=ord.map(t=>`<tr><td class="tl">${tlink(t)}</td>${R[t].seed.map((c,i)=>{const v=c/N;return `<td class="sd${i===po-1?' sdcut':''}" style="${heat(v)}">${v<.005?'':Math.round(v*100)}</td>`}).join('')}</tr>`).join('');
+  const fav=ord[0],tight=ord.filter(t=>{const p=R[t].po/N;return p>.25&&p<.75});
+  const clinch=ord.filter(t=>R[t].po===N),out=ord.filter(t=>R[t].po===0);
+  return head+`<div class="grid oddsum" style="margin-top:14px">
+   <div class="card rec"><span class="mute small">Projected most wins</span><div style="margin-top:6px">${tlink(fav)}</div><div class="small mute">${pc(R[fav].top1,N)} to finish 1st · ${(R[fav].wins/N).toFixed(1)} wins</div></div>
+   <div class="card rec"><span class="mute small">Bubble teams</span><div class="small" style="margin-top:6px">${tight.length?tight.map(t=>`${nm(t)} <span class="mute">${pc(R[t].po,N)}</span>`).join('<br>'):'No real bubble right now'}</div></div>
+   <div class="card rec"><span class="mute small">Season left</span><div class="big" style="font-size:26px;margin-top:4px">${left} week${left===1?'':'s'}</div><div class="small mute">Top ${po} of ${n} make the playoffs${clinch.length?` · locked in: ${clinch.map(nm).join(', ')}`:''}${out.length?` · eliminated: ${out.map(nm).join(', ')}`:''}</div></div></div>
+  <div class="card" style="margin-top:18px"><h2>Playoff race</h2><div class="scroll"><table class="oddst"><thead><tr><th>#</th><th class="tl">Team</th><th>Proj. wins<div class="small mute">80% range</div></th><th>Playoffs</th><th>Top 2</th><th class="hide-sm">1st</th><th class="hide-sm">Last</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="small mute">${N.toLocaleString()} simulated seasons. Wins include the current week. The line marks the playoff cut (top ${po}). Early in the season these move a lot.</p></div>
+  <div class="card" style="margin-top:18px"><h2>Seed chances</h2><div class="scroll"><table class="seedt"><thead><tr><th class="tl">Team</th>${T.map((_,i)=>`<th>${i+1}</th>`).join('')}</tr></thead><tbody>${seeds}</tbody></table></div><p class="small mute">Percent chance of finishing in each final standings spot. Darker = more likely.</p></div>`};
+function oddsMini(){const S=oddsEnsure();if(!S)return `<p class="small mute">Simulating the season…</p>`;const {R,N}=S;
+  return [...T].sort((a,b)=>R[b].po-R[a].po||R[b].wins-R[a].wins).map(t=>`<div class="omini">${tlink(t)}${obar(R[t].po,N)}</div>`).join('')+`<p class="small mute" style="margin-top:8px">Playoff chances · <a href="#odds">full season odds →</a></p>`}
 let CB='roster';try{CB=localStorage.getItem('bg-cb2')||'roster'}catch(e){}
 function stdLines(){const L={};for(const t of T)L[t]=lineS(rosterOf(t).filter(p=>!hurt(p)).map(std));return L}
 function catBasis(){if(CB==='roster'){const L=stdLines();return{r:(t,c)=>rk(L,t,c),v:(t,c)=>f1(c,L[t][c]),note:`Projected weekly output: the average per-game stats of every active player (IR/OUT left out) × 10 players × 3.5 games, using ${TS.mode==='season'?'season averages (projection if under 3 games)':TS.mode==='recent'?'recent form':'ESPN projections — same as the War Room'}.`}}return{r:(t,c)=>RK[t][c],v:(t,c)=>fmt(c,AV[t][c]),note:'Actual results: average weekly totals from the games played so far'}}
@@ -661,7 +729,7 @@ function route(){
   WORLD=null;try{rerank()}catch(e){console.error(e)}
   const h=location.hash.slice(1);
   if(h==='trades'&&(TS.deals||[]).length&&TS.sub!=='plan')WORLD=planRosters();const v=V[h]?h:'home';
-  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+v));
+  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+v));try{const on=document.querySelector('#nav a.on');if(on){const n=on.parentElement;n.scrollTo({left:on.offsetLeft-n.clientWidth/2+on.offsetWidth/2,behavior:'smooth'})}}catch(e){}
   $('#app').innerHTML=V[v]();
 }
 document.addEventListener('click',e=>{
