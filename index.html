@@ -2,6 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Bubble Guppies League</title>
+<link rel="icon" type="image/webp" href="logo.webp"><link rel="apple-touch-icon" href="logo.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -21,7 +22,10 @@ button{font:inherit;color:inherit}
 .top{position:sticky;top:0;z-index:5;background:var(--sea2);color:#e8fbf9;box-shadow:0 2px 10px #0003}
 .top .wrap{display:flex;align-items:center;gap:14px}
 .brand{font:700 20px Fredoka,sans-serif;white-space:nowrap;display:flex;align-items:center;gap:8px;padding:10px 0}
-.brand svg{width:26px;height:26px}
+.brand img{width:30px;height:auto;filter:drop-shadow(0 1px 3px #0005)}
+.herohead{display:flex;align-items:center;gap:clamp(12px,2.5vw,26px)}.herologo{width:clamp(78px,12vw,140px);height:auto;flex:none;filter:drop-shadow(0 8px 18px #0007)}
+.clogo{width:clamp(110px,16vw,170px);height:auto;filter:drop-shadow(0 8px 16px #0004)}.champhead{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.champ{text-align:center}.champ.latest{border:2px solid #f2b33d}.cyr{font:700 15px Fredoka,sans-serif;color:var(--mute)}.ctro{font-size:42px;line-height:1.1;margin:6px 0}.cmeta{display:grid;gap:8px;margin-top:12px;text-align:left;border-top:1px solid var(--line);padding-top:10px}.cmeta div{display:flex;flex-direction:column}
 nav{display:flex;overflow-x:auto;scrollbar-width:none;gap:2px;flex:1}nav::-webkit-scrollbar{display:none}
 nav a{flex:none;color:#bfe9e4;text-decoration:none;padding:0 13px;min-height:48px;display:flex;align-items:center;font-weight:600;border-bottom:3px solid transparent}
 nav a:hover{color:#fff}nav a.on{color:#fff;border-color:var(--aqua)}
@@ -136,12 +140,12 @@ footer{padding:24px 0 40px;color:var(--mute);font-size:13px;text-align:center}
 @media(max-width:600px){table{font-size:13px}td,th{padding:8px 4px}.brand span{display:none}.hero .sub{font-size:15px}}
 </style></head><body>
 <header class="top"><div class="wrap">
-<div class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 16c4-7 12-9 18-4l6-5v18l-6-5c-6 5-14 3-18-4z" fill="#ff6f5e"/><circle cx="10" cy="14.5" r="1.8" fill="#04303d"/><circle cx="6" cy="6" r="2" fill="none" stroke="#35d8c6" stroke-width="1.5"/><circle cx="11" cy="3" r="1.2" fill="none" stroke="#35d8c6" stroke-width="1.2"/></svg><span>Bubble Guppies</span></div>
+<div class="brand"><img src="logo.webp" alt="" width="30" height="35"><span>Bubble Guppies</span></div>
 <nav id="nav"><a href="#home">Home</a><a href="#standings">Standings</a><a href="#matchups">Matchups</a><a href="#teams">Teams</a><a href="#players">Players</a><a href="#trades">Trades</a><a href="#moves">Moves</a><a href="#records">Records</a><a href="#champions">Champions</a></nav>
 </div></header>
 <section class="hero" id="hero"><div class="wrap">
-<h1>Bubble Guppies</h1>
-<p class="sub" id="sub">Loading the tank…</p>
+<div class="herohead"><img class="herologo" src="logo.webp" alt="Bubble Guppies Fantasy League logo"><div><h1>Bubble Guppies</h1>
+<p class="sub" id="sub">Loading the tank…</p></div></div>
 <div class="grid" id="board"></div>
 </div></section>
 <main><div class="wrap" id="app"></div></main>
@@ -255,8 +259,13 @@ records(){
   return `<h2>League records · this season</h2><div class="grid">${best}<div class="card rec"><span class="mute small">Biggest blowout</span><div class="big">${blow.cw}-${blow.cl}</div>${tlink(blow.t)}<div class="small mute" style="margin-top:4px">Week ${blow.week} over ${nm(blow.opp)}</div></div><div class="card rec"><span class="mute small">Luckiest / unluckiest</span><div style="margin-top:8px">${tlink(lucky[0].t)}</div><div class="small w" style="margin:4px 0 10px">${(lucky[0].luck>0?'+':'')+lucky[0].luck.toFixed(2)} wins above all-play</div>${tlink(lucky.at(-1).t)}<div class="small l" style="margin-top:4px">${lucky.at(-1).luck.toFixed(2)}</div></div></div>
   <div class="card" style="margin-top:18px"><h2>Team of the week</h2><p class="small mute" style="margin-top:-6px">Best all-play record that week: how many teams they'd have beaten.</p><table><thead><tr><th>Week</th><th class="tl">Team</th><th>All-play</th></tr></thead><tbody>${totw}</tbody></table></div>`},
 champions(){
-  if(H&&H.length){const s=[...H].sort((a,b)=>b.year-a.year);return `<h2>Hall of champions</h2><div class="grid">${s.map(x=>`<div class="card rec"><span class="mute small">${esc(x.year-1)}–${esc(String(x.year).slice(2))}</span><div class="big">🏆</div><h3>${nm(x.champion)}</h3>${x.manager?`<div class="small mute">${esc(x.manager)}</div>`:''}${x.runner_up?`<div class="small" style="margin-top:8px">Runner-up: ${nm(x.runner_up)}</div>`:''}${x.regular_season?`<div class="small mute">Regular season #1: ${nm(x.regular_season)}</div>`:''}</div>`).join('')}</div>`}
-  return `<div class="card trophy"><svg viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#ffcf5a"/><stop offset="1" stop-color="#e59a1f"/></linearGradient></defs><ellipse cx="60" cy="108" rx="34" ry="6" fill="#0003"/><rect x="38" y="90" width="44" height="14" rx="3" fill="#0b5a6b"/><rect x="52" y="70" width="16" height="22" fill="url(#g)"/><path d="M30 18h60v18c0 22-14 36-30 36S30 58 30 36z" fill="url(#g)"/><path d="M30 26H16c0 16 8 24 18 24M90 26h14c0 16-8 24-18 24" fill="none" stroke="#e59a1f" stroke-width="6"/><path d="M42 24c0 18 4 30 12 36" stroke="#fff8" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="96" cy="64" r="5" fill="none" stroke="#35d8c6" stroke-width="2"/><circle cx="104" cy="48" r="3" fill="none" stroke="#35d8c6" stroke-width="2"/></svg><h2 style="margin:0">The trophy case is being stocked</h2><p class="mute" style="max-width:46ch;margin:0">Past seasons' champions, runners-up and regular-season winners are coming soon.</p></div>`}
+  const L='<img class="clogo" src="logo.webp" alt="Bubble Guppies Fantasy League logo">';
+  const sea=y=>`${y-1}–${String(y).slice(2)}`;
+  if(H&&H.length){const s=[...H].sort((a,b)=>b.year-a.year);const cnt={};s.forEach(x=>{if(x.champion)cnt[x.champion]=(cnt[x.champion]||0)+1});
+    const multi=Object.entries(cnt).filter(e=>e[1]>1).sort((a,b)=>b[1]-a[1]);
+    return `<div class="card champhead">${L}<div><h2 style="margin:0">Hall of champions</h2><p class="mute" style="margin:6px 0 0">Every Bubble Guppies title since the league started in 2021.${multi.length?` Multiple titles: ${multi.map(e=>`<b>${nm(e[0])}</b> ×${e[1]}`).join(', ')}.`:''}</p></div></div>
+    <div class="grid" style="margin-top:18px">${s.map((x,i)=>`<div class="card champ ${i===0?'latest':''}"><div class="cyr">${esc(sea(x.year))}${i===0?' <span class="tag add">latest</span>':''}</div><div class="ctro">🏆</div><h3>${nm(x.champion||'Unknown')}</h3>${x.manager?`<div class="small mute">${esc(x.manager)}</div>`:''}${x.record?`<div class="small mute">${esc(x.record)} regular season</div>`:''}<div class="cmeta">${x.runner_up?`<div><span class="mute small">Runner-up</span><b>${nm(x.runner_up)}</b></div>`:''}${x.third?`<div><span class="mute small">Third</span><b>${nm(x.third)}</b></div>`:''}${x.regular_season?`<div><span class="mute small">Regular-season #1</span><b>${nm(x.regular_season)}</b></div>`:''}</div></div>`).join('')}</div>`}
+  return `<div class="card trophy">${L}<h2 style="margin:0">The trophy case is being stocked</h2><p class="mute" style="max-width:46ch;margin:0">Past seasons' champions, runners-up and regular-season winners load with the next data update.</p></div>`}
 };
 // ===== Trades =====
 const TS={sub:'analyze',mode:'proj',inj:false,deals:[],planAll:false,a:null,b:null,ga:[],gb:[],me:null,w:{},plan:[],res:null};
@@ -499,7 +508,7 @@ addEventListener('hashchange',route);
 const LIVE='https://khadranero.github.io/war-room/data.json';
 const getData=()=>fetch('data.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json()}).catch(()=>fetch(LIVE,{cache:'no-store'}).then(r=>r.json()));
 Promise.all([getData(),fetch('history.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]).catch(()=>[])])
- .then(([d,h])=>{D=d;H=Array.isArray(h)?h:(h.seasons||[]);build();hero();route()})
+ .then(([d,h])=>{D=d;H=(Array.isArray(h)&&h.length)?h:((h&&h.seasons&&h.seasons.length)?h.seasons:(d.history||[]));build();hero();route()})
  .catch(e=>{$('#sub').textContent='Could not load league data.';console.error(e)});
 }
 </script></body></html>
